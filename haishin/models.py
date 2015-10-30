@@ -94,11 +94,13 @@ class Job(models.Model):
     MAIN_STATUSES = (
         ('Received', 'Received'),
         ('Accepted', 'Accepted'),
-        ('Delivered', 'Delivered'),
+        ('Rejected', 'Rejected'),
+        ('Shipped', 'Shipped'),
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
     )
     DELIVERY_STATUSES = (
+        ('Unassigned', 'Unassigned'),
         ('Received', 'Received'),
         ('Accepted', 'Accepted'),
         ('PickedUp', 'PickedUp'),
