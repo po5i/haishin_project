@@ -27,3 +27,5 @@
     ```
 
 That's all!
+
+To test, you can install Chrome extension [POSTMAN 3](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) and import the `Haishin.json.postman_collection`.
