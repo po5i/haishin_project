@@ -1,5 +1,6 @@
 {
 	"id": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
+	"owner": "175934",
 	"name": "Haishin",
 	"description": "",
 	"order": [
@@ -9,14 +10,47 @@
 		"fd644fce-e43a-02e0-bb0a-1b16dae9cd91"
 	],
 	"folders": [],
-	"timestamp": 1445040171437,
-	"owner": "175934",
+	"timestamp": 0,
 	"remoteLink": "",
 	"public": false,
+	"lastUpdatedBy": "175934",
+	"lastRevision": 74233768,
+	"team": null,
 	"requests": [
 		{
 			"id": "0c468b11-6aae-9106-11ed-a9bc5bb65ae6",
-			"headers": "Authorization: Token 780d10225bff4637f91c1ea1d516f7b9f0ec22c1\n",
+			"headers": "",
+			"url": "http://localhost:8000/api-token/login/auth/",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "POST",
+			"data": [
+				{
+					"key": "username",
+					"value": "admin",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "password",
+					"value": "haishin",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1446668091400,
+			"name": "login",
+			"description": "",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
+		},
+		{
+			"id": "65a9e927-f4b9-fda2-8aef-5279ac372052",
+			"headers": "Authorization: Token 6626fd65b1a54de79ced91c1bb8dd38aded5ca8a\n",
 			"url": "http://localhost:8000/api/",
 			"preRequestScript": "",
 			"pathVariables": {},
@@ -40,53 +74,18 @@
 			"tests": "",
 			"currentHelper": "normal",
 			"helperAttributes": {},
-			"time": 1445040194263,
-			"name": "login",
-			"description": "",
-			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
-			"responses": []
-		},
-		{
-			"id": "65a9e927-f4b9-fda2-8aef-5279ac372052",
-			"headers": "Authorization: Token 780d10225bff4637f91c1ea1d516f7b9f0ec22c1\n",
-			"url": "http://localhost:8000/api/",
-			"pathVariables": {},
-			"preRequestScript": "",
-			"method": "GET",
-			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
-			"data": [
-				{
-					"key": "username",
-					"value": "admin",
-					"type": "text",
-					"enabled": true
-				},
-				{
-					"key": "password",
-					"value": "haishin",
-					"type": "text",
-					"enabled": true
-				}
-			],
-			"dataMode": "params",
+			"time": 1446668111359,
 			"name": "api endpoint",
 			"description": "",
-			"descriptionFormat": "html",
-			"time": 1445040211705,
-			"version": 2,
-			"responses": [],
-			"tests": "",
-			"currentHelper": "normal",
-			"helperAttributes": {}
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
 		},
 		{
 			"id": "a2615017-e08e-670c-ccef-850b651bf834",
-			"headers": "Authorization: Token 780d10225bff4637f91c1ea1d516f7b9f0ec22c1\n",
+			"headers": "Authorization: Token 6626fd65b1a54de79ced91c1bb8dd38aded5ca8a\n",
 			"url": "http://localhost:8000/api/users/1/",
-			"pathVariables": {},
 			"preRequestScript": "",
+			"pathVariables": {},
 			"method": "GET",
-			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
 			"data": [
 				{
 					"key": "username",
@@ -102,24 +101,22 @@
 				}
 			],
 			"dataMode": "params",
-			"name": "get one user",
-			"description": "",
-			"descriptionFormat": "html",
-			"time": 1445040222305,
 			"version": 2,
-			"responses": [],
 			"tests": "",
 			"currentHelper": "normal",
-			"helperAttributes": {}
+			"helperAttributes": {},
+			"time": 1446668123256,
+			"name": "get one user",
+			"description": "",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
 		},
 		{
 			"id": "fd644fce-e43a-02e0-bb0a-1b16dae9cd91",
-			"headers": "Authorization: Token 780d10225bff4637f91c1ea1d516f7b9f0ec22c1\n",
+			"headers": "Authorization: Token 6626fd65b1a54de79ced91c1bb8dd38aded5ca8a\n",
 			"url": "http://localhost:8000/api-token/logout/",
-			"pathVariables": {},
 			"preRequestScript": "",
+			"pathVariables": {},
 			"method": "GET",
-			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
 			"data": [
 				{
 					"key": "username",
@@ -135,15 +132,14 @@
 				}
 			],
 			"dataMode": "params",
-			"name": "logout",
-			"description": "",
-			"descriptionFormat": "html",
-			"time": 1445040241932,
 			"version": 2,
-			"responses": [],
 			"tests": "",
 			"currentHelper": "normal",
-			"helperAttributes": {}
+			"helperAttributes": {},
+			"time": 1446668129189,
+			"name": "logout",
+			"description": "",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
 		}
 	]
 }

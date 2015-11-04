@@ -3,52 +3,48 @@
 1. Clone the repository
 
 2. Create a virtualenv (optional)
-    2.1 Install Virtual env
-        ```
+
+  2.1 Install Virtualenv
+
+        sudo apt-get install python-pip
         sudo pip install virtualenv
-        ```
-    2.2 Inicializate a virtual en
-        ```
-        virtualenv DeliDeluxe
-        ```
-    2.3 Activate the virtualenv
-        ```
-        cd DeliDeluxe/
+
+  2.2 Initialize a virtualenv
+
+        virtualenv DeliDelux
+
+  2.3 Activate the virtualenv
+
+        cd DeliDelux/
         source bin/activate
-        ```
 
+3. Install Python dev
 
-3. Install Python dev 
-    ```
-    sudo apt-get install python-dev
-    ```
+        sudo apt-get install python-dev
 
-4. Install Libjpeg 
-    ```
-    sudo apt-get install libjpeg8-dev
-    ```
+4. Install Libjpeg
+
+        sudo apt-get install libjpeg8-dev
 
 5. Install Django 1.8 and dependencies
-    ```
-    pip install -r requirements.txt
-    ```
+
+        pip install -r requirements.txt
+
 
 6. Comment the 'haishin' app line in haishin_project/settings.py INSTALLED_APPS list
-    ```
-    python manage.py migrate
-    ```
+
+        python manage.py migrate
+
 
 7. Uncomment previous line
-    ```
-    python manage.py makemigrations
-    python manage.py migrate
-    python manage.py createsuperuser
-    ```
+
+        python manage.py makemigrations
+        python manage.py migrate
+        python manage.py createsuperuser
 
 8. Run the server
-    ```
-    python manage.py runserver
-    ```
+
+        python manage.py runserver
 
 That's all!
 
