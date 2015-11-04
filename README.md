@@ -4,19 +4,19 @@
 
 2. Create a virtualenv (optional)
 
-  2.1 Install Virtualenv
+  1. Install Virtualenv
 
-        sudo apt-get install python-pip
-        sudo pip install virtualenv
+            sudo apt-get install python-pip
+            sudo pip install virtualenv
 
-  2.2 Initialize a virtualenv
+  2. Initialize a virtualenv
 
-        virtualenv DeliDelux
+            virtualenv DeliDelux
 
-  2.3 Activate the virtualenv
+  3. Activate the virtualenv
 
-        cd DeliDelux/
-        source bin/activate
+            cd DeliDelux/
+            source bin/activate
 
 3. Install Python dev
 
@@ -30,11 +30,9 @@
 
         pip install -r requirements.txt
 
-
-6. Comment the 'haishin' app line in haishin_project/settings.py INSTALLED_APPS list
+6. Comment the **haishin** app line in `haishin_project/settings.py` **INSTALLED_APPS** list
 
         python manage.py migrate
-
 
 7. Uncomment previous line
 
