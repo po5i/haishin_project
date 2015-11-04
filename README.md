@@ -7,13 +7,13 @@
         ```
         sudo pip install virtualenv
         ```
-    2.2 Inicializate a virtual en
+    2.2 Inicializate a virtual env
         ```
-        virtualenv DeliDeluxe
+        virtualenv DeliDelux
         ```
-    2.3 Activate the virtualenv
+    2.3 Activate the virtual env
         ```
-        cd DeliDeluxe/
+        cd DeliDelux/
         source bin/activate
         ```
 
