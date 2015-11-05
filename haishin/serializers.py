@@ -33,12 +33,17 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     def create(self, validated_data):
         if "profile" in validated_data:
             profile_data = validated_data.pop('profile')
+        else:
+            profile_data = None
+
         user = User.objects.create(**validated_data)
         if user:
             user.set_password(user.password)
             user.save()
-        if "profile" in validated_data:
+        if profile_data:
             Profile.objects.create(user=user, **profile_data)
+        else:
+            Profile.objects.create(user=user)
         return user
 
     
