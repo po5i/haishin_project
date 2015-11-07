@@ -20,7 +20,11 @@ class Country(models.Model):
     tax = models.DecimalField(blank=True,null=True,max_digits=5, decimal_places=2)
 
     def __str__(self):
-            return u''.join(self.name).encode('utf-8')
+        return u''.join(self.name).encode('utf-8')
+
+    class Meta:
+        verbose_name_plural = "countries"
+        ordering = ['name']
 
 class City(models.Model):
     name = models.CharField(max_length=250)
@@ -30,9 +34,19 @@ class City(models.Model):
     def __str__(self):
         return u''.join(self.name).encode('utf-8')
 
+    class Meta:
+        verbose_name_plural = "cities"
+        ordering = ['name']
+
 class Town(models.Model):
     name = models.CharField(max_length=250)
     city = models.ForeignKey(City)
+
+    def __str__(self):
+        return u''.join(self.name).encode('utf-8')
+
+    class Meta:
+        ordering = ['name']
 
 class Profile(models.Model):
     SOURCES = (
@@ -59,8 +73,15 @@ class BusinessCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True,null=True)
 
+    def __str__(self):
+        return u''.join(self.name).encode('utf-8')
+
+    class Meta:
+        verbose_name_plural = "business categories"
+        ordering = ['name']
+
 class Business(models.Model):
-    admin = models.OneToOneField(User)
+    admin = models.ForeignKey(User)
     category = models.ForeignKey(BusinessCategory)
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True,null=True)
@@ -72,29 +93,42 @@ class Business(models.Model):
     latitude = models.CharField(max_length=100)
     longitude = models.CharField(max_length=100)
     phone = models.CharField(max_length=100,blank=True,null=True)
-    discount = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     average_time = models.IntegerField(default=0)
     published = models.BooleanField(default=True)
     
     def __str__(self):
-        return u''.join(("",self.user.username)).encode('utf-8')
+        return u''.join(("",self.name)).encode('utf-8')
+
+    class Meta:
+        verbose_name_plural = "businesses"
     
 class DishCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True,null=True)
 
+    def __str__(self):
+        return u''.join(self.name).encode('utf-8')
+
+    class Meta:
+        verbose_name_plural = "dish categories"
+        ordering = ['name']
+
 class Dish(models.Model):
     business = models.ForeignKey(Business)
-    category = models.ForeignKey(BusinessCategory)
+    category = models.ForeignKey(DishCategory)
     name = models.CharField(max_length=100)
     tags = models.TextField(blank=True,null=True)
     description = models.TextField(blank=True,null=True)
-    price = models.DecimalField(max_digits=5, decimal_places=2)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
     #photo = models.ImageField(upload_to=get_dish_path,blank=True,null=True)
     published = models.BooleanField(default=True)
     
     def __str__(self):
         return u''.join((self.name)).encode('utf-8')
+
+    class Meta:
+        verbose_name_plural = "dishes"
 
 class Job(models.Model):
     MAIN_STATUSES = (
@@ -105,18 +139,32 @@ class Job(models.Model):
         ('Completed', 'Completed'),
         ('Cancelled', 'Cancelled'),
     )
+    # SWIFT STATUSES
+    #DELIVERY_STATUSES = (
+    #    ('1', 'Unassigned'),
+    #    ('2', 'Received'),
+    #    ('4', 'Accepted'),
+    #    ('5', 'PickedUp'),
+    #    ('7', 'Completed'),
+    #    ('0', 'Cancelled'),
+    #)
+
+    # SHIPPIFY STATUSES
     DELIVERY_STATUSES = (
-        ('Unassigned', 'Unassigned'),
-        ('Received', 'Received'),
-        ('Accepted', 'Accepted'),
-        ('PickedUp', 'PickedUp'),
-        ('Completed', 'Completed'),
-        ('Cancelled', 'Cancelled'),
+        ('1', 'Getting ready'),
+        ('2', 'Pending to assign'),
+        ('3', 'Pending for shipper response'),
+        ('4', 'Shipper confirmed'),
+        ('5', 'Being picked up'),
+        ('6', 'Being delivered'),
+        ('7', 'Delivered successfully'),
+        ('0', 'Cancelled'),
     )
     user = models.ForeignKey(User)
     business = models.ForeignKey(Business)
     timestamp = models.DateTimeField(auto_now_add=True)
-    swift_api_id = models.CharField(max_length=512,blank=True,null=True)
+    swift_job_id = models.CharField(max_length=512,blank=True,null=True)
+    shippify_task_id = models.CharField(max_length=512,blank=True,null=True)
     payment_reference_id = models.CharField(max_length=512,blank=True,null=True)
     recipient_name = models.CharField(max_length=100,blank=True,null=True)
     recipient_address = models.CharField(max_length=100,blank=True,null=True)

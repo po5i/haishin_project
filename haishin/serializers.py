@@ -6,13 +6,14 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from django.conf import settings
 from django.core.mail import send_mail
+import json
 
 class ProfileSerializer(serializers.ModelSerializer):
     get_chef_id = serializers.ReadOnlyField()    #Model property
     class Meta:
         model = Profile
         
-class UserSerializer(serializers.HyperlinkedModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(partial=True)
     
     def to_internal_value(self, data):
@@ -73,19 +74,68 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         write_only_fields = ('password',)
 
 class BusinessSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    admin = UserSerializer()
     class Meta:
         model = Business
         
 class DishSerializer(serializers.ModelSerializer):
-    business = BusinessSerializer()    
+    business = BusinessSerializer()
+    class Meta:
+        model = Dish
+
+class SimpleDishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
 
 class JobSerializer(serializers.ModelSerializer):
+    business = BusinessSerializer()
+
     class Meta:
         model = Job
+
+    # override in order to include 'details' field
+    def to_internal_value(self, data):
+        output = super(JobSerializer, self).to_internal_value(data)
+       
+        details = data.get('details')
+        # Perform the data validation.
+        if not details:
+            raise serializers.ValidationError({
+                'details': 'This field is required.'
+            })
+
+        output["details"] = json.loads(details)
+        return output
+
+    def to_representation(self, instance):
+        ret = super(JobSerializer, self).to_representation(instance)
+        details = JobDetail.objects.filter(job=instance)
+        ret['details'] = []
+        for detail in details:
+            serialized_detail = JobDetailSerializer(detail).data
+            ret['details'].append(serialized_detail)
+        #TODO: add tracking info here
+        return ret
+
+    def create(self, validated_data):
+        if "details" in validated_data:
+            details = validated_data.pop('details')
+        else:
+            details = None
+
+        job = Job.objects.create(**validated_data)
         
+        if details:
+            for detail in details:
+                JobDetail.objects.create(job=job,dish_id=detail["dish"])
+        
+        return job
+
+class JobDetailSerializer(serializers.ModelSerializer): 
+    dish = SimpleDishSerializer()
+    class Meta:
+        model = JobDetail
+
 class HistorySerializer(serializers.ModelSerializer):
     user = UserSerializer()
     business = BusinessSerializer()

@@ -28,6 +28,7 @@ class UserAdmin(UserAdmin):
 
 class BusinessAdmin(admin.ModelAdmin):
     inlines = (DishInline, )
+    list_display = ('name', 'category', 'country', 'city', 'town')
 
 class CityAdmin(admin.ModelAdmin):
 	inlines = (TownInline, )
