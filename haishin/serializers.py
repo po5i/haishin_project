@@ -91,3 +91,12 @@ class HistorySerializer(serializers.ModelSerializer):
     business = BusinessSerializer()
     class Meta:
         model = Job
+
+class CountrySerializer(serializers.ModelSerializer): 
+    class Meta:
+        model = Country
+
+class CitySerializer(serializers.ModelSerializer):
+    country = CountrySerializer()  
+    class Meta:
+        model = City

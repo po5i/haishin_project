@@ -234,4 +234,14 @@ class HistoryViewSet(viewsets.ModelViewSet):
 class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
     queryset = Job.objects.all()
+
+# Vista para manejar ciudades
+class CityViewSet(viewsets.ModelViewSet):
+    serializer_class = CitySerializer
+    permission_classes = (AllowAny,)
     
+    def get_queryset(self):
+        city_code = self.request.query_params.get('city_code', None)
+        queryset = City.objects.filter(country__code=city_code) if city_code is not None else City.objects.all()
+        return queryset
+

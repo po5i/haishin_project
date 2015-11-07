@@ -27,6 +27,7 @@ from django.conf.urls.static import static
 router = routers.DefaultRouter()
 router.register(r'users', UserViewSet)
 router.register(r'dishes', DishViewSet, 'dishes')
+router.register(r'city', CityViewSet, 'city')
 router.register(r'business', BusinessViewSet, 'business')
 router.register(r'jobs', JobViewSet, 'jobs')
 router.register(r'history', HistoryViewSet, 'history')

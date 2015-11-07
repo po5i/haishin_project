@@ -19,13 +19,19 @@ class Country(models.Model):
     code = models.CharField(max_length=3,help_text='Ej: CL, AR, ...')
     tax = models.DecimalField(blank=True,null=True,max_digits=5, decimal_places=2)
 
+    def __str__(self):
+            return u''.join(self.name).encode('utf-8')
+
 class City(models.Model):
     name = models.CharField(max_length=250)
     code = models.CharField(max_length=3,help_text='Ej: SCL, BSAS, ...')
+    country = models.ForeignKey(Country)
+    
+    def __str__(self):
+        return u''.join(self.name).encode('utf-8')
 
 class Town(models.Model):
     name = models.CharField(max_length=250)
-    country = models.ForeignKey(Country)
     city = models.ForeignKey(City)
 
 class Profile(models.Model):
