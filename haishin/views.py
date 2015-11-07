@@ -241,6 +241,6 @@ class CityViewSet(viewsets.ModelViewSet):
     permission_classes = (AllowAny,)
     
     def get_queryset(self):
-        city_code = self.request.query_params.get('city_code', None)
-        queryset = City.objects.filter(country__code=city_code) if city_code is not None else City.objects.all()
+        code = self.request.query_params.get('code', None)
+        queryset = City.objects.filter(country__code=code) if code is not None else City.objects.all()
         return queryset
