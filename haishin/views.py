@@ -244,16 +244,3 @@ class CityViewSet(viewsets.ModelViewSet):
         city_code = self.request.query_params.get('city_code', None)
         queryset = City.objects.filter(country__code=city_code) if city_code is not None else City.objects.all()
         return queryset
-"""
-    def create(self, request, *args, **kwargs):
-        data=request.DATA
-
-        f = Foo.objects.create()
-
-        # ... create nested objects from request data ...  
-
-        # ...
-        return Response(serializer.data, 
-                        status=status.HTTP_201_CREATED,
-                        headers=headers)
-"""

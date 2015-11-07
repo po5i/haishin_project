@@ -88,8 +88,6 @@ class SimpleDishSerializer(serializers.ModelSerializer):
         model = Dish
 
 class JobSerializer(serializers.ModelSerializer):
-    business = BusinessSerializer()
-
     class Meta:
         model = Job
 

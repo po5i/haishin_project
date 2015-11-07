@@ -14,13 +14,13 @@ class DishInline(admin.StackedInline):
     model = Dish
 
 class TownInline(admin.StackedInline):
-	model = Town
+    model = Town
 
 class JobDetailInline(admin.StackedInline):
-	model = JobDetail
+    model = JobDetail
 
 class JobStatusHistoryInline(admin.StackedInline):
-	model = JobStatusHistory
+    model = JobStatusHistory
 
 # custom admins
 class UserAdmin(UserAdmin):
@@ -28,13 +28,19 @@ class UserAdmin(UserAdmin):
 
 class BusinessAdmin(admin.ModelAdmin):
     inlines = (DishInline, )
-    list_display = ('name', 'category', 'country', 'city', 'town')
+    list_display = ('name', 'category', 'get_country', 'get_city', 'town')
+
+    def get_country(self, obj):
+        return obj.town.city.country
+    def get_city(self, obj):
+        return obj.town.city
 
 class CityAdmin(admin.ModelAdmin):
-	inlines = (TownInline, )
+    inlines = (TownInline, )
 
 class JobAdmin(admin.ModelAdmin):
-	inlines = (JobDetailInline, JobStatusHistoryInline, )
+    inlines = (JobDetailInline, JobStatusHistoryInline, )
+    list_display = ('timestamp', 'user', 'business', 'main_status', 'delivery_status')
 
 # Re-register UserAdmin
 admin.site.unregister(User)

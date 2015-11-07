@@ -86,14 +86,12 @@ class Business(models.Model):
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True,null=True)
     image = models.ImageField(upload_to=get_business_path,blank=True,null=True)
-    country = models.ForeignKey(Country)
-    city = models.ForeignKey(City)
     town = models.ForeignKey(Town)
     address = models.CharField(max_length=100)
-    latitude = models.CharField(max_length=100)
-    longitude = models.CharField(max_length=100)
+    latitude = models.CharField(max_length=100,blank=True,null=True)
+    longitude = models.CharField(max_length=100,blank=True,null=True)
     phone = models.CharField(max_length=100,blank=True,null=True)
-    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    discount = models.DecimalField(max_digits=10, decimal_places=2, default=0,blank=True,null=True)
     average_time = models.IntegerField(default=0)
     published = models.BooleanField(default=True)
     
@@ -173,6 +171,9 @@ class Job(models.Model):
     delivery_status = models.CharField(max_length=100,choices=DELIVERY_STATUSES)
     payment_status = models.CharField(max_length=100,blank=True,null=True)
     remarks = models.TextField(blank=True,null=True)
+
+    class Meta:
+        ordering = ['-timestamp']
 
 class JobDetail(models.Model):
     job = models.ForeignKey(Job)
