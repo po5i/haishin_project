@@ -27,7 +27,7 @@ from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 
 
-# Clases para la autenticación manual
+# Normal authentication classes
 class ObtainAuthToken(APIView):
     throttle_classes = ()
     permission_classes = (AllowAny,)
@@ -97,47 +97,6 @@ class ResetPassword(APIView):
                           'info@haishin.io',
                           [email], fail_silently=False)
         return Response({'status': 'ok'})
-        
-    
-    
-"""
-class ObtainUser(APIView):
-    throttle_classes = ()
-    permission_classes = (IsAuthenticated,)
-    parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.JSONParser,)
-    renderer_classes = (renderers.JSONRenderer,)
-    serializer_class = AuthTokenSerializer
-    model = Token
-
-    # Renvoi le user si le token est valide
-    def get(self, request):
-        print request.user
-
-        #if not request.user.is_authenticated():
-        #    return Response("Not logged in",status=status.HTTP_401_UNAUTHORIZED)
-
-        serializer = self.serializer_class(data=request.DATA)
-        if request.META.get('HTTP_AUTHORIZATION'):
-
-            auth = request.META.get('HTTP_AUTHORIZATION').split()
-            print auth
-
-            if not auth or auth[0].lower() != b'token' or len(auth) != 2:
-                msg = 'Invalid token header. No credentials provided.'
-                return Response(msg, status=status.HTTP_401_UNAUTHORIZED)
-            
-            try:
-                token = Token.objects.get(key=auth[1])
-                if token and token.user.is_active:
-                    return Response({'id': token.user_id, 'userRole': 'user', 'token': token.key})
-            except:
-                return Response("Error, Tokes does not exists",status=status.HTTP_401_UNAUTHORIZED)
-        else:
-            if serializer.is_valid():
-                return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
-            else:
-                return Response("Error, Not Authorized",status=status.HTTP_401_UNAUTHORIZED)
-"""
 
 class ObtainLogout(APIView):
     throttle_classes = ()
@@ -160,7 +119,6 @@ class ObtainLogout(APIView):
                 return Response(msg, status=status.HTTP_401_UNAUTHORIZED)
             
             try:
-            #if True:
                 token = Token.objects.get(key=auth[1])
                 if token and token.user.is_active:
                     token.delete()
@@ -184,27 +142,24 @@ class ObtainLogout(APIView):
 # API
 # --------------------------------------------------------------------------------
 
-# Vista para crear y obtener usuarios
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
     def get_permissions(self):
         # allow non-authenticated user to create via POST
         return (AllowAny() if self.request.method == 'POST'
                 else IsAuthenticated()),
 
-# Vista para manejar platos, permite filtrado por business
 class DishViewSet(viewsets.ModelViewSet):
     serializer_class = DishSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+
     def get_queryset(self):
-        #po5i: filtrado por parametro GET
-        #queryset = Dish.objects.filter(published=True)
         business_id = self.request.query_params.get('business_id', None)
         queryset = Dish.objects.filter(business_id=business_id,published=True) if business_id is not None else None
         return queryset
 
-# Vista para manejar business
 class BusinessViewSet(viewsets.ModelViewSet):
     serializer_class = BusinessSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
@@ -219,30 +174,10 @@ class BusinessViewSet(viewsets.ModelViewSet):
             queryset = Business.objects.filter(town__city__id=city_id)
         return queryset
 
-# Vista para ver el historial filtrado por usuario  
-class HistoryViewSet(viewsets.ModelViewSet):
-    serializer_class = HistorySerializer
-    
-    def get_queryset(self):
-        #filtering
-        queryset = Job.objects.all()
-        
-        user_id = self.request.query_params.get('user_id', None)
-        if user_id is not None:
-            queryset = queryset.filter(user_id=user_id)
-            
-        business_id = self.request.query_params.get('business_id', None)
-        if business_id is not None:
-            queryset = queryset.filter(dish__chef_id=business_id)
-            
-        return queryset
-
-# Vista para manejar jobs
 class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
     queryset = Job.objects.all()
 
-# Vista para manejar ciudades
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)

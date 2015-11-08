@@ -30,7 +30,6 @@ router.register(r'dish', DishViewSet, 'dish')
 router.register(r'city', CityViewSet, 'city')
 router.register(r'business', BusinessViewSet, 'business')
 router.register(r'job', JobViewSet, 'job')
-router.register(r'history', HistoryViewSet, 'history')
 
 
 urlpatterns = [

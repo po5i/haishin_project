@@ -92,21 +92,27 @@ class JobSerializer(serializers.ModelSerializer):
        
         details = data.get('details')
         # Perform the data validation.
-        if not details:
-            raise serializers.ValidationError({
-                'details': 'This field is required.'
-            })
-
-        output["details"] = json.loads(details)
+        if details:
+            output["details"] = json.loads(details)
+        
         return output
 
     def to_representation(self, instance):
         ret = super(JobSerializer, self).to_representation(instance)
+        
         details = JobDetail.objects.filter(job=instance)
         ret['details'] = []
         for detail in details:
             serialized_detail = JobDetailSerializer(detail).data
             ret['details'].append(serialized_detail)
+
+        history = JobStatusHistory.objects.filter(job=instance)
+        ret['history'] = []
+        for h in history:
+            serialized_history = JobStatusHistorySerializer(h).data
+            ret['history'].append(serialized_history)
+
+        
         #TODO: add tracking info here
         return ret
 
@@ -116,12 +122,28 @@ class JobSerializer(serializers.ModelSerializer):
         else:
             details = None
 
+        # save the job
         job = Job.objects.create(**validated_data)
         
+        # save the details
         if details:
             for detail in details:
                 JobDetail.objects.create(job=job,dish_id=detail["dish"])
+
+        # save the status history
+        JobStatusHistory.objects.create(job=job,main_status=job.main_status,delivery_status=job.delivery_status)
         
+        return job
+
+    def update(self, instance, validated_data):
+        instance.main_status = validated_data.get('main_status', instance.main_status)
+        instance.delivery_status = validated_data.get('delivery_status', instance.delivery_status)
+        instance.save()
+
+        job = instance
+        # save the status history
+        JobStatusHistory.objects.create(job=job,main_status=job.main_status,delivery_status=job.delivery_status)
+
         return job
 
 class JobDetailSerializer(serializers.ModelSerializer): 
@@ -129,11 +151,9 @@ class JobDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobDetail
 
-class HistorySerializer(serializers.ModelSerializer):
-    user = UserSerializer()
-    business = BusinessSerializer()
+class JobStatusHistorySerializer(serializers.ModelSerializer): 
     class Meta:
-        model = Job
+        model = JobStatusHistory
 
 class CountrySerializer(serializers.ModelSerializer): 
     class Meta:
