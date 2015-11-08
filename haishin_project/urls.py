@@ -25,12 +25,11 @@ from django.conf.urls.static import static
 
 #routers 
 router = routers.DefaultRouter()
-router.register(r'users', UserViewSet)
-router.register(r'dishes', DishViewSet, 'dishes')
+router.register(r'user', UserViewSet)
+router.register(r'dish', DishViewSet, 'dish')
 router.register(r'city', CityViewSet, 'city')
-router.register(r'city/business', City_BusinessViewSet, 'city_business')
 router.register(r'business', BusinessViewSet, 'business')
-router.register(r'jobs', JobViewSet, 'jobs')
+router.register(r'job', JobViewSet, 'job')
 router.register(r'history', HistoryViewSet, 'history')
 
 

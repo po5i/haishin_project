@@ -49,7 +49,7 @@ class ApiTests(APISimpleTestCase):
                             'address': 'Angamos 317'
                 }
         }
-        response = self.client.post('/api/users/',data, format='json')
+        response = self.client.post('/api/user/',data, format='json')
         user = User.objects.get(username='po5i')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(user.username, 'po5i')
@@ -79,7 +79,7 @@ class ApiTests(APISimpleTestCase):
         user = User.objects.get(username='po5i')
         token = Token.objects.get(user=user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        response = self.client.put('/api/users/' + str(user.id) + '/',data, format='json')
+        response = self.client.put('/api/user/' + str(user.id) + '/',data, format='json')
         user = User.objects.get(username='po5i')    #update object
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(user.profile.address, '111')
@@ -100,12 +100,57 @@ class ApiTests(APISimpleTestCase):
         }
         token = Token.objects.get(user=user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        response = self.client.post('/api/jobs/',data, format='json')
+        response = self.client.post('/api/job/',data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['user'], user.id)
         self.assertEqual(response.data['business'], 1)
         self.assertEqual(response.data['recipient_name'], 'Carlos')
         self.assertEqual(response.data['details'][0]['id'], 1)
 
+    def test_5_filter_city(self):
+        """
+        Testing list of City by Country
+        """
+        data = {
+                'code': 'CL'
+        }
+        response = self.client.get('/api/city/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['name'], 'Santiago')
+        self.assertEqual(response.data[0]['id'], 1)
 
+    def test_6_filter_business_city(self):
+        """
+        Testing list of Business by city id
+        """
+        data = {
+                'city_id': 1
+        }
+        response = self.client.get('/api/business/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['name'], 'La parrillada Uruguaya')
+        self.assertEqual(response.data[0]['town'], 1)
 
+    def test_7_filter_business_town(self):
+        """
+        Testing list of Business by town id
+        """
+        data = {
+                'town_id': 2
+        }
+        response = self.client.get('/api/business/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['name'], 'Planta Maestra')
+        self.assertEqual(response.data[0]['id'], 2)
+
+    def test_7_filter_dish_business(self):
+        """
+        Testing list of dishes by business id
+        """
+        data = {
+                'business_id': 2
+        }
+        response = self.client.get('/api/dish/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['name'], 'Festin Vegano')
+        self.assertEqual(response.data[0]['price'], '500.00')

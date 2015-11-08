@@ -28,7 +28,7 @@ class Country(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=250)
-    code = models.CharField(max_length=3,help_text='Ej: SCL, BSAS, ...')
+    code = models.CharField(max_length=5,help_text='Ej: SCL, BSAS, ...')
     country = models.ForeignKey(Country)
     
     def __str__(self):

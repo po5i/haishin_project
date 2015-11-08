@@ -79,11 +79,6 @@ class BusinessSerializer(serializers.ModelSerializer):
         model = Business
         
 class DishSerializer(serializers.ModelSerializer):
-    business = BusinessSerializer()
-    class Meta:
-        model = Dish
-
-class SimpleDishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
 
@@ -130,7 +125,7 @@ class JobSerializer(serializers.ModelSerializer):
         return job
 
 class JobDetailSerializer(serializers.ModelSerializer): 
-    dish = SimpleDishSerializer()
+    dish = DishSerializer()
     class Meta:
         model = JobDetail
 

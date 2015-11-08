@@ -196,21 +196,28 @@ class UserViewSet(viewsets.ModelViewSet):
 # Vista para manejar platos, permite filtrado por business
 class DishViewSet(viewsets.ModelViewSet):
     serializer_class = DishSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     def get_queryset(self):
         #po5i: filtrado por parametro GET
-        queryset = Dish.objects.filter(published=True)
+        #queryset = Dish.objects.filter(published=True)
         business_id = self.request.query_params.get('business_id', None)
-        if business_id is not None:
-            queryset = queryset.filter(business_id=business_id)
+        queryset = Dish.objects.filter(business_id=business_id,published=True) if business_id is not None else None
         return queryset
 
 # Vista para manejar business
-# po5i: lo mejor sería que el business traiga todos los platos en el mismo response
 class BusinessViewSet(viewsets.ModelViewSet):
     serializer_class = BusinessSerializer
-    permission_classes = (AllowAny,)
-    queryset = Business.objects.all()
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        city_id = self.request.query_params.get('city_id', None)
+        town_id = self.request.query_params.get('town_id', None)
+        queryset = None
+        if city_id is not None:
+            queryset = Business.objects.filter(town__city__id=city_id)
+        elif town_id is not None:
+            queryset = Business.objects.filter(town__id=town_id)
+        return queryset
 
 # Vista para ver el historial filtrado por usuario  
 class HistoryViewSet(viewsets.ModelViewSet):
@@ -238,7 +245,7 @@ class JobViewSet(viewsets.ModelViewSet):
 # Vista para manejar ciudades
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     
     def get_queryset(self):
         code = self.request.query_params.get('code', None)
