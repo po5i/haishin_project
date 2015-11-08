@@ -213,10 +213,10 @@ class BusinessViewSet(viewsets.ModelViewSet):
         city_id = self.request.query_params.get('city_id', None)
         town_id = self.request.query_params.get('town_id', None)
         queryset = None
-        if city_id is not None:
-            queryset = Business.objects.filter(town__city__id=city_id)
-        elif town_id is not None:
+        if town_id is not None:
             queryset = Business.objects.filter(town__id=town_id)
+        elif city_id is not None:
+            queryset = Business.objects.filter(town__city__id=city_id)
         return queryset
 
 # Vista para ver el historial filtrado por usuario  
