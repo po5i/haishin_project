@@ -26,6 +26,9 @@ from django.core.files.base import ContentFile
 from django.utils.crypto import get_random_string
 from django.core.mail import send_mail
 
+import googlemaps
+gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
+
 
 # Normal authentication classes
 class ObtainAuthToken(APIView):
@@ -46,7 +49,7 @@ class ObtainAuthToken(APIView):
                     email=email_or_username,
                 )
             request.DATA["username"] = user_request.username
-        
+
         #serialize the request
         serializer = self.serializer_class(data=request.DATA)
 
@@ -62,7 +65,7 @@ class ObtainAuthToken(APIView):
             """
             # saved for future use (social login)
             user = register_by_access_token(request, backend)
-            
+
             if user and user.is_active:
                 login(request, user)
                 token, created = Token.objects.get_or_create(user=user)
@@ -80,18 +83,18 @@ class ResetPassword(APIView):
     renderer_classes = (renderers.JSONRenderer,)
     serializer_class = AuthTokenSerializer
     model = Token
-    
+
     def post(self, request):
         email = request.data.get("email","")
         user = get_object_or_404(
                 User,
                 email=email,
         )
-        
+
         random = get_random_string()
         user.set_password(random)
         user.save()
-        
+
         send_mail('Cambio de contraseña para su cuenta',
                           u'Usted ha solicitado resetear su contraseña de cuenta. La puede cambiar cualquier momento editando su perfil.\n\nSu nueva contraseña temporal es:\n\n'+random,
                           'info@haishin.io',
@@ -117,7 +120,6 @@ class ObtainLogout(APIView):
             if not auth or auth[0].lower() != b'token' or len(auth) != 2:
                 msg = 'Invalid token header. No credentials provided.'
                 return Response(msg, status=status.HTTP_401_UNAUTHORIZED)
-            
             try:
                 token = Token.objects.get(key=auth[1])
                 if token and token.user.is_active:
@@ -130,9 +132,24 @@ class ObtainLogout(APIView):
             return Response("Error, Not Authorized",status=status.HTTP_401_UNAUTHORIZED)
 
 
+class DistanceMatrix(APIView):
+    throttle_classes = ()
+    permission_classes = (AllowAny,)
 
+    def post(self, request):
+        origin = self.request.DATA.get('origin', None)
+        destination = self.request.DATA.get('destination', None)
 
-
+        try:
+            response = gmaps.distance_matrix(origin,destination)
+            if response["rows"][0]["elements"][0]["status"] == "OK":
+                duration = response["rows"][0]["elements"][0]["duration"]["text"]
+                distance = response["rows"][0]["elements"][0]["distance"]["text"]
+                return Response({'duration': duration, 'distance': distance})
+            else:
+                return Response({'status': response["rows"][0]["elements"][0]["status"]})
+        except:
+            raise Http404
 
 
 
@@ -181,7 +198,7 @@ class JobViewSet(viewsets.ModelViewSet):
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    
+
     def get_queryset(self):
         code = self.request.query_params.get('code', None)
         queryset = City.objects.filter(country__code=code) if code is not None else City.objects.all()

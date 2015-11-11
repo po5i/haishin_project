@@ -41,4 +41,5 @@ urlpatterns = [
     url(r'^api-token/reset/', ResetPassword.as_view()),
     #url(r'^api-token/user/', ObtainUser.as_view()),
     url(r'^api-token/logout/', ObtainLogout.as_view()),
+    url(r'^util/distance/', DistanceMatrix.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
