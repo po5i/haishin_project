@@ -73,8 +73,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         write_only_fields = ('password',)
 
+class BusinessCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessCategory
+        
+
 class BusinessSerializer(serializers.ModelSerializer):
     admin = UserSerializer()
+    category = BusinessCategorySerializer()
     class Meta:
         model = Business
         
@@ -163,3 +169,8 @@ class CitySerializer(serializers.ModelSerializer):
     country = CountrySerializer()  
     class Meta:
         model = City
+
+class TownSerializer(serializers.ModelSerializer):
+    #country = CountrySerializer()  
+    class Meta:
+        model = Town

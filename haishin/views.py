@@ -29,6 +29,9 @@ from django.core.mail import send_mail
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
 
+import json
+from rest_framework.renderers import JSONRenderer
+
 
 # Normal authentication classes
 class ObtainAuthToken(APIView):
@@ -153,6 +156,37 @@ class DistanceMatrix(APIView):
 
 
 
+class RestaurantMatrix(APIView):
+    throttle_classes = ()
+    permission_classes = (AllowAny,)
+
+    def post(self, request):
+        address = self.request.DATA.get('address',None)
+        city = self.request.DATA.get('city',None)
+        country = self.request.DATA.get('country',None)
+        try:
+            response = gmaps.geocode(address+","+city+","+country)
+
+            list_restaurants=[]
+            geometry={}
+            if response:
+                geometry = response[0]["geometry"]["bounds"]
+                for x in response[0]["address_components"]:
+                    if "locality" in x["types"]:
+                        long_name=x["long_name"]
+                if long_name:
+                    t = Town.objects.filter(name=long_name).filter(city__country__code=country)
+                    queryset = Business.objects.filter(town=t) if len(t) > 0 else Business.objects.filter(town__city__name=long_name).filter(town__city__country__code=country)
+
+                    for y in queryset:
+
+                            y = BusinessSerializer(y)
+                            y = json.loads(JSONRenderer().render(y.data))
+
+                            list_restaurants.append(y)
+            return Response({"business":list_restaurants,"geometry":geometry})
+        except:
+            raise Http404
 
 
 # --------------------------------------------------------------------------------
