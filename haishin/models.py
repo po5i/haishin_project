@@ -46,7 +46,7 @@ class Town(models.Model):
         return u''.join((self.name,' / ',self.city.name,' / ',self.city.country.name)).encode('utf-8')
 
     class Meta:
-        ordering = ['name','city__name','city__country__name']
+        ordering = ['city__country__name','city__name','name']
 
 class Profile(models.Model):
     SOURCES = (
