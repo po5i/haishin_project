@@ -28,7 +28,7 @@ class Country(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=250)
-    code = models.CharField(max_length=5,help_text='Ej: SCL, BSAS, ...')
+    code = models.CharField(max_length=5,help_text='Ej: SCL, CABA, ...')
     country = models.ForeignKey(Country)
     
     def __str__(self):
@@ -43,10 +43,10 @@ class Town(models.Model):
     city = models.ForeignKey(City)
 
     def __str__(self):
-        return u''.join(self.name).encode('utf-8')
+        return u''.join((self.name,' / ',self.city.name,' / ',self.city.country.name)).encode('utf-8')
 
     class Meta:
-        ordering = ['name']
+        ordering = ['name','city__name','city__country__name']
 
 class Profile(models.Model):
     SOURCES = (
