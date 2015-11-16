@@ -83,9 +83,34 @@ class BusinessSerializer(serializers.ModelSerializer):
     class Meta:
         model = Business
 
+class DishCustomizationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DishCustomization
+
+class DishAddonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DishAddon
+
 class DishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
+
+    def to_representation(self, instance):
+        ret = super(DishSerializer, self).to_representation(instance)
+
+        items = DishCustomization.objects.filter(dish=instance)
+        ret['customizations'] = []
+        for item in items:
+            serialized_detail = DishCustomizationSerializer(item).data
+            ret['customizations'].append(serialized_detail)
+
+        items = DishAddon.objects.filter(dish=instance)
+        ret['addons'] = []
+        for item in items:
+            serialized_detail = DishAddonSerializer(item).data
+            ret['addons'].append(serialized_detail)
+
+        return ret
 
 class JobSerializer(serializers.ModelSerializer):
     class Meta:

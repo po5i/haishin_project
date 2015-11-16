@@ -226,4 +226,3 @@ class JobStatusHistory(models.Model):
     class Meta:
         ordering = ['timestamp']
 
-    
