@@ -22,9 +22,20 @@ class JobDetailInline(admin.StackedInline):
 class JobStatusHistoryInline(admin.StackedInline):
     model = JobStatusHistory
 
+class DishCustomizationInline(admin.StackedInline):
+    model = DishCustomization
+
+class DishAddonInline(admin.StackedInline):
+    model = DishAddon
+
+
+
 # custom admins
 class UserAdmin(UserAdmin):
     inlines = (ProfileInline, )
+
+class DishAdmin(admin.ModelAdmin):
+    inlines = (DishCustomizationInline, DishAddonInline)
 
 class BusinessAdmin(admin.ModelAdmin):
     inlines = (DishInline, )
@@ -49,6 +60,7 @@ admin.site.register(User, UserAdmin)
 # Our model
 admin.site.register(Business, BusinessAdmin)
 admin.site.register(BusinessCategory)
+admin.site.register(Dish, DishAdmin)
 admin.site.register(DishCategory)
 admin.site.register(Country)
 admin.site.register(City, CityAdmin)

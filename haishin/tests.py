@@ -32,7 +32,7 @@ class ApiTests(APISimpleTestCase):
         Business.objects.create(id=1,admin_id=1000,category_id=3,name="La parrillada Uruguaya",town_id=1,address="Manuel Mont 870")
         Business.objects.create(id=2,admin_id=1000,category_id=1,name="Planta Maestra",town_id=2,address="Apoquindo 870")
 
-        Dish.objects.create(id=1,business_id=1,category_id=4,name="Gran Parrillada",price=6500)
+        Dish.objects.create(id=1,business_id=1,category_id=5,name="Gran Parrillada",price=6500)
         Dish.objects.create(id=2,business_id=2,category_id=6,name="Festin Vegano",price=500)
 
     def test_1_create_user(self):
@@ -169,4 +169,11 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.data['main_status'], 'Accepted')
         self.assertEqual(response.data['delivery_status'], '2')
 
-        
+    def test_10_check_dish_group_by_business(self):
+        data = {
+                'business_id': 2
+        }
+        response = self.client.get('/util/dish/category/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data[0]['name'], 'Gourmet')
+        self.assertEqual(response.data[0]['dishes'][0]['name'], 'Festin Vegano')

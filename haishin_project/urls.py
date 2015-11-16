@@ -23,7 +23,7 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
 
-#routers 
+#routers
 router = routers.DefaultRouter()
 router.register(r'user', UserViewSet)
 router.register(r'dish', DishViewSet, 'dish')
@@ -36,11 +36,12 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='haishin.html')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(router.urls)),
-    
+
     url(r'^api-token/login/(?P<backend>[^/]+)/$', ObtainAuthToken.as_view()),
     url(r'^api-token/reset/', ResetPassword.as_view()),
     #url(r'^api-token/user/', ObtainUser.as_view()),
     url(r'^api-token/logout/', ObtainLogout.as_view()),
     url(r'^util/distance/', DistanceMatrix.as_view()),
     url(r'^util/restaurant/', RestaurantMatrix.as_view()),
+    url(r'^util/dish/category/', DishByCategoryViewSet.as_view()),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -188,6 +188,28 @@ class RestaurantMatrix(APIView):
         except:
             raise Http404
 
+class DishByCategoryViewSet(APIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get(self, request):
+        business_id = self.request.query_params.get('business_id', None)
+
+        categories = {}
+        dishes = Dish.objects.filter(business_id=business_id,published=True).order_by('name') if business_id is not None else None
+        for dish in dishes:
+            if not categories.has_key(dish.category.name):
+                categories[dish.category.name] = []
+            categories[dish.category.name].append(DishSerializer(dish).data)
+
+        # manually process for json readability
+        json_categories = []
+        for key, items in categories.iteritems():
+            json_categories.append({
+                'name': key,
+                'dishes': items
+            })
+
+        return Response(json_categories)
 
 # --------------------------------------------------------------------------------
 # API

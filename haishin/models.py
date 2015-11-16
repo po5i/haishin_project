@@ -7,9 +7,15 @@ import sys,os,time
 def get_avatar_path(self,filename):
     filename = time.strftime("%Y%m%d-%H%M%S") + filename
     return os.path.join("avatar", "users", filename)
+def get_city_path(self,filename):
+    filename = time.strftime("%Y%m%d-%H%M%S") + filename
+    return os.path.join("city", filename)
 def get_business_path(self,filename):
     filename = time.strftime("%Y%m%d-%H%M%S") + filename
     return os.path.join("business", filename)
+def get_business_cover_path(self,filename):
+    filename = time.strftime("%Y%m%d-%H%M%S") + filename
+    return os.path.join("business_cover", filename)
 def get_dish_path(self,filename):
     filename = time.strftime("%Y%m%d-%H%M%S") + filename
     return os.path.join("dishes", filename)
@@ -30,7 +36,8 @@ class City(models.Model):
     name = models.CharField(max_length=250)
     code = models.CharField(max_length=5,help_text='Ej: SCL, CABA, ...')
     country = models.ForeignKey(Country)
-    
+    image = models.ImageField(upload_to=get_city_path,blank=True,null=True)
+
     def __str__(self):
         return u''.join(self.name).encode('utf-8')
 
@@ -86,6 +93,7 @@ class Business(models.Model):
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True,null=True)
     image = models.ImageField(upload_to=get_business_path,blank=True,null=True)
+    cover_image = models.ImageField(upload_to=get_business_cover_path,blank=True,null=True)
     town = models.ForeignKey(Town)
     address = models.CharField(max_length=100)
     latitude = models.CharField(max_length=100,blank=True,null=True)
@@ -93,14 +101,31 @@ class Business(models.Model):
     phone = models.CharField(max_length=100,blank=True,null=True)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0,blank=True,null=True)
     average_time = models.IntegerField(default=0)
+    price_range = models.IntegerField(default=0)
     published = models.BooleanField(default=True)
-    
+    closed = models.BooleanField(default=False)
+
+    monday_opens = models.TimeField(blank=True,null=True)
+    monday_closes = models.TimeField(blank=True,null=True)
+    tuesday_opens = models.TimeField(blank=True,null=True)
+    tuesday_closes = models.TimeField(blank=True,null=True)
+    wednesday_opens = models.TimeField(blank=True,null=True)
+    wednesday_closes = models.TimeField(blank=True,null=True)
+    thursday_opens = models.TimeField(blank=True,null=True)
+    thursday_closes = models.TimeField(blank=True,null=True)
+    friday_opens = models.TimeField(blank=True,null=True)
+    friday_closes = models.TimeField(blank=True,null=True)
+    saturday_opens = models.TimeField(blank=True,null=True)
+    saturday_closes = models.TimeField(blank=True,null=True)
+    sunday_opens = models.TimeField(blank=True,null=True)
+    sunday_closes = models.TimeField(blank=True,null=True)
+
     def __str__(self):
         return u''.join(("",self.name)).encode('utf-8')
 
     class Meta:
         verbose_name_plural = "businesses"
-    
+
 class DishCategory(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True,null=True)
@@ -121,12 +146,25 @@ class Dish(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     #photo = models.ImageField(upload_to=get_dish_path,blank=True,null=True)
     published = models.BooleanField(default=True)
-    
+
+    available_from = models.TimeField(blank=True,null=True)
+    available_to = models.TimeField(blank=True,null=True)
+
     def __str__(self):
         return u''.join((self.name)).encode('utf-8')
 
     class Meta:
         verbose_name_plural = "dishes"
+
+class DishCustomization(models.Model):
+    dish = models.ForeignKey(Dish)
+    name = models.CharField(max_length=100)
+    options = models.TextField(blank=True,null=True,help_text="Opciones separadas con coma")
+
+class DishAddon(models.Model):
+    dish = models.ForeignKey(Dish)
+    name = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
 
 class Job(models.Model):
     MAIN_STATUSES = (

@@ -1,21 +1,22 @@
 {
 	"id": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
-	"owner": "175934",
 	"name": "Haishin",
 	"description": "",
 	"order": [
 		"0c468b11-6aae-9106-11ed-a9bc5bb65ae6",
 		"65a9e927-f4b9-fda2-8aef-5279ac372052",
 		"a2615017-e08e-670c-ccef-850b651bf834",
-		"fd644fce-e43a-02e0-bb0a-1b16dae9cd91"
+		"fd644fce-e43a-02e0-bb0a-1b16dae9cd91",
+		"f03e63a5-30fe-9c8e-267e-293683cb2e90",
+		"fa128aa5-f5b2-64a0-4058-d17fd0459548",
+		"11fca88b-72ac-7c46-a9a0-c4f06dca9efa",
+		"1110e970-f2d1-bc06-b161-f1685b7c79b2"
 	],
 	"folders": [],
 	"timestamp": 0,
+	"owner": "175934",
 	"remoteLink": "",
 	"public": false,
-	"lastUpdatedBy": "175934",
-	"lastRevision": 74233768,
-	"team": null,
 	"requests": [
 		{
 			"id": "0c468b11-6aae-9106-11ed-a9bc5bb65ae6",
@@ -46,6 +47,183 @@
 			"time": 1446668091400,
 			"name": "login",
 			"description": "",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
+		},
+		{
+			"id": "1110e970-f2d1-bc06-b161-f1685b7c79b2",
+			"headers": "",
+			"url": "http://localhost:8000/util/dish/category/?business_id=1",
+			"preRequestScript": "",
+			"pathVariables": {},
+			"method": "GET",
+			"data": [
+				{
+					"key": "address",
+					"value": "Rosal 377",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "country",
+					"value": "CL",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "city",
+					"value": "Santiago",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1447701431720,
+			"name": "dish by category by restaurant",
+			"description": "",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
+			"responses": []
+		},
+		{
+			"id": "11fca88b-72ac-7c46-a9a0-c4f06dca9efa",
+			"headers": "",
+			"url": "http://localhost:8000/util/restaurant/",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "POST",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
+			"data": [
+				{
+					"key": "address",
+					"value": "Rosal 377",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "country",
+					"value": "CL",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "city",
+					"value": "Santiago",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"dataMode": "params",
+			"name": "restaurants by geocode",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1447686541007,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"folder": null,
+			"id": "41dc84b4-4f76-8d36-8710-8fb97ca61ade",
+			"name": "create job",
+			"dataMode": "params",
+			"data": [
+				{
+					"key": "user",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "business",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "recipient_name",
+					"value": "Jorjao",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "recipient_address",
+					"value": "Angamos 317",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "main_status",
+					"value": "Received",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "delivery_status",
+					"value": "1",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "remarks",
+					"value": "Que esté bien caliente",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "details",
+					"value": "[{\"dish\":\"1\"},{\"dish\":\"2\"}]",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"rawModeData": null,
+			"descriptionFormat": "html",
+			"description": "",
+			"headers": "Authorization: Token 50c237af05792bbd850b3874bbec0bf25ddd96cf\n",
+			"method": "POST",
+			"pathVariables": {},
+			"url": "http://localhost:8000/api/job/",
+			"preRequestScript": "",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
+		},
+		{
+			"folder": null,
+			"id": "4e58e56a-a519-05db-9386-09303b3637bb",
+			"name": "update job status",
+			"dataMode": "params",
+			"data": [
+				{
+					"key": "main_status",
+					"value": "Accepted",
+					"type": "text",
+					"enabled": true
+				},
+				{
+					"key": "delivery_status",
+					"value": "2",
+					"type": "text",
+					"enabled": true
+				}
+			],
+			"rawModeData": null,
+			"descriptionFormat": "html",
+			"description": "",
+			"headers": "Authorization: Token 50c237af05792bbd850b3874bbec0bf25ddd96cf\n",
+			"method": "PATCH",
+			"pathVariables": {},
+			"url": "http://localhost:8000/api/job/13/",
+			"preRequestScript": "",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
 			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
 		},
 		{
@@ -109,6 +287,65 @@
 			"name": "get one user",
 			"description": "",
 			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
+		},
+		{
+			"id": "f03e63a5-30fe-9c8e-267e-293683cb2e90",
+			"headers": "",
+			"url": "http://localhost:8000/api/city/",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
+			"data": [],
+			"dataMode": "params",
+			"name": "cities",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1447686202668,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
+		},
+		{
+			"folder": null,
+			"id": "f6c4e5b8-48f3-099d-2388-7715f2cc3c6a",
+			"name": "get a job",
+			"dataMode": "params",
+			"data": [],
+			"rawModeData": null,
+			"descriptionFormat": "html",
+			"description": "",
+			"headers": "Authorization: Token 50c237af05792bbd850b3874bbec0bf25ddd96cf\n",
+			"method": "GET",
+			"pathVariables": {},
+			"url": "http://localhost:8000/api/job/13/",
+			"preRequestScript": "",
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8"
+		},
+		{
+			"id": "fa128aa5-f5b2-64a0-4058-d17fd0459548",
+			"headers": "",
+			"url": "http://localhost:8000/api/dish/?business_id=1",
+			"pathVariables": {},
+			"preRequestScript": "",
+			"method": "GET",
+			"collectionId": "5fc8d9cf-4b4b-1826-d90b-4b5e521a77e8",
+			"data": [],
+			"dataMode": "params",
+			"name": "dishes by restaurant",
+			"description": "",
+			"descriptionFormat": "html",
+			"time": 1447686268444,
+			"version": 2,
+			"responses": [],
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {}
 		},
 		{
 			"id": "fd644fce-e43a-02e0-bb0a-1b16dae9cd91",
