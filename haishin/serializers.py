@@ -91,6 +91,10 @@ class DishAddonSerializer(serializers.ModelSerializer):
     class Meta:
         model = DishAddon
 
+class DishAddonCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DishAddonCategory
+
 class DishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
@@ -105,10 +109,20 @@ class DishSerializer(serializers.ModelSerializer):
             ret['customizations'].append(serialized_detail)
 
         items = DishAddon.objects.filter(dish=instance)
-        ret['addons'] = []
+        
+        categories = {}
         for item in items:
-            serialized_detail = DishAddonSerializer(item).data
-            ret['addons'].append(serialized_detail)
+            if not categories.has_key(item.category.id):
+                categories[item.category.id] = DishAddonCategorySerializer(item.category).data
+                categories[item.category.id]['items'] = []
+            categories[item.category.id]['items'].append(DishAddonSerializer(item).data)
+
+        #parse categories for better reading
+        json_categories = []
+        for key, items in categories.iteritems():
+            json_categories.append(items)    
+        
+        ret['addons'] = json_categories
 
         return ret
 

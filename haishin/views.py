@@ -188,6 +188,7 @@ class RestaurantMatrix(APIView):
         except:
             raise Http404
 
+
 class DishByCategoryViewSet(APIView):
     permission_classes = (IsAuthenticatedOrReadOnly,)
 

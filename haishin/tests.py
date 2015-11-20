@@ -28,12 +28,17 @@ class ApiTests(APISimpleTestCase):
         DishCategory.objects.create(id=4,name="Pescados")
         DishCategory.objects.create(id=5,name="Carnes")
         DishCategory.objects.create(id=6,name="Gourmet")
+        DishAddonCategory.objects.create(id=1,name="Salsas",maximum=5)
+        DishAddonCategory.objects.create(id=2,name="Ingredientes",maximum=3)
 
         Business.objects.create(id=1,admin_id=1000,category_id=3,name="La parrillada Uruguaya",town_id=1,address="Manuel Mont 870")
         Business.objects.create(id=2,admin_id=1000,category_id=1,name="Planta Maestra",town_id=2,address="Apoquindo 870")
 
         Dish.objects.create(id=1,business_id=1,category_id=5,name="Gran Parrillada",price=6500)
         Dish.objects.create(id=2,business_id=2,category_id=6,name="Festin Vegano",price=500)
+
+        DishAddon.objects.create(id=1,name="Cebolla",price=1000,category_id=2,dish_id=2)
+        DishAddon.objects.create(id=2,name="Lechuga",price=500,category_id=2,dish_id=2)
 
     def test_1_create_user(self):
         """
@@ -177,3 +182,5 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data[0]['name'], 'Gourmet')
         self.assertEqual(response.data[0]['dishes'][0]['name'], 'Festin Vegano')
+        self.assertEqual(response.data[0]['dishes'][0]['addons'][0]['name'], 'Ingredientes')
+        self.assertEqual(response.data[0]['dishes'][0]['addons'][0]['items'][0]['name'], 'Cebolla')

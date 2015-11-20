@@ -60,6 +60,7 @@ admin.site.register(User, UserAdmin)
 # Our model
 admin.site.register(Business, BusinessAdmin)
 admin.site.register(BusinessCategory)
+admin.site.register(DishAddonCategory)
 admin.site.register(Dish, DishAdmin)
 admin.site.register(DishCategory)
 admin.site.register(Country)
