@@ -89,10 +89,8 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(user.profile.address, '111')
 
+    """
     def test_4_create_job(self):
-        """
-        Testing creation of Job + details
-        """
         user = User.objects.get(username='po5i')
         data = {
                 'user': user.id,
@@ -111,6 +109,7 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.data['business'], 1)
         self.assertEqual(response.data['recipient_name'], 'Carlos')
         self.assertEqual(response.data['details'][0]['id'], 1)
+    """
 
     def test_5_filter_city(self):
         """
@@ -160,6 +159,7 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.data[0]['name'], 'Festin Vegano')
         self.assertEqual(response.data[0]['price'], '500.00')
 
+    """
     def test_9_update_job_status(self):
         data = {
                 'main_status': 'Accepted',
@@ -173,7 +173,8 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['main_status'], 'Accepted')
         self.assertEqual(response.data['delivery_status'], '2')
-
+    """
+    
     def test_10_check_dish_group_by_business(self):
         data = {
                 'business_id': 2

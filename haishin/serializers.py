@@ -8,6 +8,13 @@ from django.conf import settings
 from django.core.mail import send_mail
 import json
 
+import calendar
+import shippify
+
+import googlemaps
+gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     get_chef_id = serializers.ReadOnlyField()    #Model property
     class Meta:
@@ -156,7 +163,13 @@ class JobSerializer(serializers.ModelSerializer):
             serialized_history = JobStatusHistorySerializer(h).data
             ret['history'].append(serialized_history)
 
-        #TODO: add tracking info here
+        # Shippify task info
+        try:
+            response = shippify.Task.get_task(instance.shippify_task_id)
+            ret['shippify'] = response
+        except:
+            ret['shippify'] = {}
+
         return ret
 
     def create(self, validated_data):
@@ -169,12 +182,85 @@ class JobSerializer(serializers.ModelSerializer):
         job = Job.objects.create(**validated_data)
 
         # save the details
+        shippify_products = []  #id, name, qty, size=2
+        total = 0
         if details:
             for detail in details:
-                JobDetail.objects.create(job=job,dish_id=detail["dish"])
+                dish = Dish.objects.get(id=detail["dish"])
+                total = total + dish.price
+                job_detail = JobDetail.objects.create(job=job,dish=dish)
+                shippify_products.append({
+                    'id': dish.id,
+                    'name': dish.name,
+                    'qty': detail["quantity"],
+                    'size': 2
+                })
+
+                # save the addons
+                if "addons" in detail:
+                    for addon in detail["addons"]:
+                        dish_addon = DishAddon.objects.get(id=addon.get("id"))
+                        total = total + dish_addon.price
+                        JobDetailAddons.objects.create(detail=job_detail,addon=dish_addon,price=dish_addon.price)
+
+
+        # TODO: compute the total / check from client
+        #job.total = total
 
         # save the status history
         JobStatusHistory.objects.create(job=job,main_status=job.main_status,delivery_status=job.delivery_status)
+
+        # Geolocalization job.recipient_address:
+        #response = gmaps.geocode(job.recipient_address)
+        #recipient_latitude = response[0]["geometry"]["location"]["lat"]
+        #recipient_longitude = response[0]["geometry"]["location"]["lng"]
+
+        # parse delivery_date to EPOCH
+        # (delivery_date is in UTC)
+        unix_delivery_date = calendar.timegm(job.delivery_date.timetuple())
+
+        # integrate shippify API
+        api_data = {
+            'task': {
+                'products': shippify_products,
+                'recipient': {
+                    'name': job.recipient_name,
+                    'email': job.user.email,
+                    'phone': job.recipient_phone
+                },
+                'sender': {
+                    'name': job.business.name,
+                    'email': job.business.admin.email,
+                    'phone': job.business.phone
+                },
+                'pickup': {
+                    'address': job.business.address,
+                    'lat': job.business.latitude,
+                    'lgn': job.business.longitude
+                },
+                'deliver': {
+                    'address': job.recipient_address,
+                    'lat': job.recipient_latitude,
+                    'lgn': job.recipient_longitude
+                },
+                'extra': '{\"job_id\":\"%d\",\"source\":\"DeliDelux\",\"debug\":\"%s\"}' % (job.id, settings.DEBUG) ,
+                'payment_type': 1,
+                'payment_status': 2,
+                'total_amount': 0,
+                'delivery_date': unix_delivery_date
+            }
+        }
+
+        try:
+            shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
+            response = shippify.Task.create_task(api_data)
+            job.shippify_task_id = response['id']
+            job.shippify_distance = response['distance']
+            job.shippify_price = response['price']
+            job.save()
+        except Exception as e:
+            msg = "Shippify API ERROR: %s" % e
+            raise serializers.ValidationError(msg)
 
         return job
 

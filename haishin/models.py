@@ -213,14 +213,20 @@ class Job(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     swift_job_id = models.CharField(max_length=512,blank=True,null=True)
     shippify_task_id = models.CharField(max_length=512,blank=True,null=True)
+    shippify_distance = models.FloatField(blank=True,null=True)
+    shippify_price = models.DecimalField(blank=True,null=True,max_digits=5, decimal_places=2)
     payment_reference_id = models.CharField(max_length=512,blank=True,null=True)
     recipient_name = models.CharField(max_length=100,blank=True,null=True)
     recipient_address = models.CharField(max_length=100,blank=True,null=True)
     recipient_phone = models.CharField(max_length=100,blank=True,null=True)
+    recipient_latitude = models.CharField(max_length=100,blank=True,null=True)
+    recipient_longitude = models.CharField(max_length=100,blank=True,null=True)
     main_status = models.CharField(max_length=100,choices=MAIN_STATUSES)
+    delivery_date = models.DateTimeField()
     delivery_status = models.CharField(max_length=100,choices=DELIVERY_STATUSES)
     payment_status = models.CharField(max_length=100,blank=True,null=True)
     remarks = models.TextField(blank=True,null=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         ordering = ['-timestamp']
@@ -228,6 +234,11 @@ class Job(models.Model):
 class JobDetail(models.Model):
     job = models.ForeignKey(Job)
     dish = models.ForeignKey(Dish)
+
+class JobDetailAddons(models.Model):
+    detail = models.ForeignKey(JobDetail)
+    addon = models.ForeignKey(DishAddon)
+    price = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)    #for history purposes
 
 class JobStatusHistory(models.Model):
     job = models.ForeignKey(Job)
