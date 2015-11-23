@@ -236,12 +236,12 @@ class JobSerializer(serializers.ModelSerializer):
                 'pickup': {
                     'address': job.business.address,
                     'lat': job.business.latitude,
-                    'lgn': job.business.longitude
+                    'lng': job.business.longitude
                 },
                 'deliver': {
                     'address': job.recipient_address,
                     'lat': job.recipient_latitude,
-                    'lgn': job.recipient_longitude
+                    'lng': job.recipient_longitude
                 },
                 'extra': '{\"job_id\":\"%d\",\"source\":\"DeliDelux\",\"debug\":\"%s\"}' % (job.id, settings.DEBUG) ,
                 'payment_type': 1,

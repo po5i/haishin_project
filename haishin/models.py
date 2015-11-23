@@ -23,7 +23,7 @@ def get_dish_path(self,filename):
 class Country(models.Model):
     name = models.CharField(max_length=250)
     code = models.CharField(max_length=3,help_text='Ej: CL, AR, ...')
-    tax = models.DecimalField(blank=True,null=True,max_digits=5, decimal_places=2)
+    tax = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)
 
     def __str__(self):
         return u''.join(self.name).encode('utf-8')
@@ -214,7 +214,7 @@ class Job(models.Model):
     swift_job_id = models.CharField(max_length=512,blank=True,null=True)
     shippify_task_id = models.CharField(max_length=512,blank=True,null=True)
     shippify_distance = models.FloatField(blank=True,null=True)
-    shippify_price = models.DecimalField(blank=True,null=True,max_digits=5, decimal_places=2)
+    shippify_price = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)
     payment_reference_id = models.CharField(max_length=512,blank=True,null=True)
     recipient_name = models.CharField(max_length=100,blank=True,null=True)
     recipient_address = models.CharField(max_length=100,blank=True,null=True)

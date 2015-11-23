@@ -61,7 +61,8 @@ class Task(object):
 		# POST https://services.shippify.co/task/new
 
 		response = requests.post('https://services.shippify.co/task/new', json=api_data, auth=(Configuration.SHIPPIFY_API_KEY, Configuration.SHIPPIFY_API_SECRET))
-		print response.request.body
+		#print response.request.body
+		#print response.json()
 
 		if response.status_code > 201:
 			raise Exception('Error %d: %s' % (response.status_code,response.text))
