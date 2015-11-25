@@ -241,7 +241,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         city_id = self.request.query_params.get('city_id', None)
         town_id = self.request.query_params.get('town_id', None)
-        queryset = None
+        queryset = Business.objects.all()
         if town_id is not None:
             queryset = Business.objects.filter(town__id=town_id)
         elif city_id is not None:
