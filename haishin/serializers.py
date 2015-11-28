@@ -284,6 +284,10 @@ class JobStatusHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = JobStatusHistory
 
+class DishCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DishCategory
+
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country

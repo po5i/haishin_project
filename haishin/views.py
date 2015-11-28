@@ -252,6 +252,11 @@ class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
     queryset = Job.objects.all()
 
+class DishCategoryViewSet(viewsets.ModelViewSet):
+    serializer_class = DishCategorySerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    queryset = DishCategory.objects.all()
+
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
