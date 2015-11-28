@@ -173,7 +173,7 @@ class DishCustomization(models.Model):
     options = models.TextField(blank=True,null=True,help_text="Opciones separadas con coma")
 
 class DishAddon(models.Model):
-    dish = models.ForeignKey(Dish)
+    dish = models.ForeignKey(Dish, related_name="addons")
     name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(DishAddonCategory)

@@ -105,7 +105,7 @@ class DishAddonCategorySerializer(serializers.ModelSerializer):
 class DishSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dish
-
+    
     def to_representation(self, instance):
         ret = super(DishSerializer, self).to_representation(instance)
 
@@ -132,6 +132,36 @@ class DishSerializer(serializers.ModelSerializer):
         ret['addons'] = json_categories
 
         return ret
+
+    def to_internal_value(self, data):
+        output = data
+        try:
+            output['business'] = Business.objects.get(id=data['business'])
+            output['category'] = DishCategory.objects.get(id=data['category'])
+        except:
+            raise serializers.ValidationError({
+                'business': 'Bad business or category id'
+            })
+
+        return output
+
+    def create(self, validated_data):
+        if "addons" in validated_data:
+            addons = validated_data.pop('addons')
+        else:
+            addons = None
+
+        # save the job
+        dish = Dish.objects.create(**validated_data)
+
+        # save the addons
+        if addons:
+            for addon in addons:
+                addon_category = DishAddonCategory.objects.create(name=addon['name'],maximum=addon['maximum'])
+                for item in addon['items']:
+                    addon = DishAddon.objects.create(dish=dish,name=item['name'],price=item['price'],category=addon_category)
+
+        return dish
 
 class JobSerializer(serializers.ModelSerializer):
     class Meta:
