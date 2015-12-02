@@ -31,8 +31,8 @@ class ApiTests(APISimpleTestCase):
         DishAddonCategory.objects.create(id=1,name="Salsas",maximum=5)
         DishAddonCategory.objects.create(id=2,name="Ingredientes",maximum=3)
 
-        Business.objects.create(id=1,admin_id=1000,category_id=3,name="La parrillada Uruguaya",town_id=1,address="Manuel Mont 870")
-        Business.objects.create(id=2,admin_id=1000,category_id=1,name="Planta Maestra",town_id=2,address="Apoquindo 870")
+        Business.objects.create(id=1,admin_id=1000,category_id=3,name="La parrillada Uruguaya",town_id=1,address="Manuel Mont 870",latitude=-33.436571,longitude=-70.623346)
+        Business.objects.create(id=2,admin_id=1000,category_id=1,name="Planta Maestra",town_id=2,address="Apoquindo 870",latitude=-33.436571,longitude=-70.623346)
 
         Dish.objects.create(id=1,business_id=1,category_id=5,name="Gran Parrillada",price=6500)
         Dish.objects.create(id=2,business_id=2,category_id=6,name="Festin Vegano",price=500)
@@ -89,27 +89,46 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(user.profile.address, '111')
 
-    """
-    def test_4_create_job(self):
+
+    def test_40_create_job(self):
         user = User.objects.get(username='po5i')
         data = {
                 'user': user.id,
-                'business': 1,
+                'business': 2,
                 'recipient_name': 'Carlos',
                 'recipient_address': 'Angamos 317',
                 'main_status': 'Received',
                 'delivery_status': '1',
-                'details': '[{"dish":"1"}]'
+                'remarks': 'Alergico a la soya',
+                'details': '[{"dish":"2","quantity":"1","addons":[{"id":"1"},{"id":"2"}] }]',
+                'delivery_date': '2015-12-18 15:05:00',
+                'recipient_phone': '123456789',
+                'total': '0',
+                'recipient_latitude': '-33.436571',
+                'recipient_longitude': '-70.623346'
         }
         token = Token.objects.get(user=user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         response = self.client.post('/api/job/',data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['user'], user.id)
-        self.assertEqual(response.data['business'], 1)
+        self.assertEqual(response.data['business'], 2)
         self.assertEqual(response.data['recipient_name'], 'Carlos')
         self.assertEqual(response.data['details'][0]['id'], 1)
-    """
+
+    def test_41_update_job_status(self):
+        data = {
+                'main_status': 'Accepted',
+                'delivery_status': '2',
+        }
+        user = User.objects.get(username='po5i')
+        token = Token.objects.get(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        job = Job.objects.get(user=user,business_id=2)
+        response = self.client.patch('/api/job/' + str(job.id) + '/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['main_status'], 'Accepted')
+        self.assertEqual(response.data['delivery_status'], '2')
 
     def test_5_filter_city(self):
         """
@@ -159,23 +178,7 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.data[0]['name'], 'Festin Vegano')
         self.assertEqual(response.data[0]['price'], '500.00')
 
-    """
-    def test_9_update_job_status(self):
-        data = {
-                'main_status': 'Accepted',
-                'delivery_status': '2',
-        }
-        user = User.objects.get(username='po5i')
-        token = Token.objects.get(user=user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        job = Job.objects.get(user=user,business_id=1)
-        response = self.client.patch('/api/job/' + str(job.id) + '/',data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['main_status'], 'Accepted')
-        self.assertEqual(response.data['delivery_status'], '2')
-    """
-    
-    def test_10_check_dish_group_by_business(self):
+    def test_9_check_dish_group_by_business(self):
         data = {
                 'business_id': 2
         }
@@ -185,3 +188,4 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.data[0]['dishes'][0]['name'], 'Festin Vegano')
         self.assertEqual(response.data[0]['dishes'][0]['addons'][0]['name'], 'Ingredientes')
         self.assertEqual(response.data[0]['dishes'][0]['addons'][0]['items'][0]['name'], 'Cebolla')
+
