@@ -85,6 +85,7 @@ class BusinessCategorySerializer(serializers.ModelSerializer):
 
 
 class BusinessSerializer(serializers.ModelSerializer):
+    is_open = serializers.ReadOnlyField()    #Model property
     admin = UserSerializer()
     category = BusinessCategorySerializer()
     class Meta:
@@ -103,6 +104,7 @@ class DishAddonCategorySerializer(serializers.ModelSerializer):
         model = DishAddonCategory
 
 class DishSerializer(serializers.ModelSerializer):
+    is_available = serializers.ReadOnlyField()    #Model property
     class Meta:
         model = Dish
     

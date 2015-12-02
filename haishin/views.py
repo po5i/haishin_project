@@ -243,9 +243,11 @@ class BusinessViewSet(viewsets.ModelViewSet):
         town_id = self.request.query_params.get('town_id', None)
         queryset = Business.objects.all()
         if town_id is not None:
-            queryset = Business.objects.filter(town__id=town_id)
+            queryset = Business.objects.filter(town__id=town_id).order_by('closed')
         elif city_id is not None:
-            queryset = Business.objects.filter(town__city__id=city_id)
+            queryset = Business.objects.filter(town__city__id=city_id).order_by('closed')
+        #sory by open
+        queryset = sorted(queryset, key=lambda t: not t.is_open)
         return queryset
 
 class JobViewSet(viewsets.ModelViewSet):

@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
 import sys,os,time
+import datetime
+from django.conf import settings
 
 #User._meta.get_field('email')._unique = True
 
@@ -11,6 +13,9 @@ def get_city_path(self,filename):
     filename = time.strftime("%Y%m%d-%H%M%S") + filename
     return os.path.join("city", filename)
 def get_business_path(self,filename):
+    filename = time.strftime("%Y%m%d-%H%M%S") + filename
+    return os.path.join("business", filename)
+def get_logo_path(self,filename):
     filename = time.strftime("%Y%m%d-%H%M%S") + filename
     return os.path.join("business", filename)
 def get_business_cover_path(self,filename):
@@ -24,6 +29,7 @@ class Country(models.Model):
     name = models.CharField(max_length=250)
     code = models.CharField(max_length=3,help_text='Ej: CL, AR, ...')
     tax = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)
+    average_delivery_time = models.IntegerField(blank=True,null=True,default=30,help_text='En minutos')
 
     def __str__(self):
         return u''.join(self.name).encode('utf-8')
@@ -93,6 +99,7 @@ class Business(models.Model):
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True,null=True)
     image = models.ImageField(upload_to=get_business_path,blank=True,null=True)
+    logo = models.ImageField(upload_to=get_logo_path,blank=True,null=True)
     cover_image = models.ImageField(upload_to=get_business_cover_path,blank=True,null=True)
     town = models.ForeignKey(Town)
     address = models.CharField(max_length=100)
@@ -105,26 +112,48 @@ class Business(models.Model):
     published = models.BooleanField(default=True)
     closed = models.BooleanField(default=False)
 
-    monday_opens = models.TimeField(blank=True,null=True)
-    monday_closes = models.TimeField(blank=True,null=True)
-    tuesday_opens = models.TimeField(blank=True,null=True)
-    tuesday_closes = models.TimeField(blank=True,null=True)
-    wednesday_opens = models.TimeField(blank=True,null=True)
-    wednesday_closes = models.TimeField(blank=True,null=True)
-    thursday_opens = models.TimeField(blank=True,null=True)
-    thursday_closes = models.TimeField(blank=True,null=True)
-    friday_opens = models.TimeField(blank=True,null=True)
-    friday_closes = models.TimeField(blank=True,null=True)
-    saturday_opens = models.TimeField(blank=True,null=True)
-    saturday_closes = models.TimeField(blank=True,null=True)
-    sunday_opens = models.TimeField(blank=True,null=True)
-    sunday_closes = models.TimeField(blank=True,null=True)
+    monday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    monday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    tuesday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    tuesday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    wednesday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    wednesday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    thursday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    thursday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    friday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    friday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    saturday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    saturday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    sunday_opens = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    sunday_closes = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
 
     def __str__(self):
         return u''.join(("",self.name)).encode('utf-8')
 
     class Meta:
         verbose_name_plural = "businesses"
+
+    @property
+    def is_open(self):
+        now = datetime.datetime.now().time()
+        weekday = datetime.datetime.today().weekday()
+
+        if weekday == 0 and self.monday_opens < now and now < self.monday_closes:
+            return True
+        elif weekday == 1 and self.tuesday_opens < now and now < self.tuesday_closes:
+            return True
+        elif weekday == 2 and self.wednesday_opens < now and now < self.wednesday_closes:
+            return True
+        elif weekday == 3 and self.thursday_opens < now and now < self.thursday_closes:
+            return True
+        elif weekday == 4 and self.friday_opens < now and now < self.friday_closes:
+            return True
+        elif weekday == 5 and self.saturday_opens < now and now < self.saturday_closes:
+            return True
+        elif weekday == 6 and self.sunday_opens < now and now < self.sunday_closes:
+            return True
+        else:
+            return False
 
 class DishCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -147,14 +176,23 @@ class Dish(models.Model):
     #photo = models.ImageField(upload_to=get_dish_path,blank=True,null=True)
     published = models.BooleanField(default=True)
 
-    available_from = models.TimeField(blank=True,null=True)
-    available_to = models.TimeField(blank=True,null=True)
+    available_from = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
+    available_to = models.TimeField(blank=True,null=True,help_text=settings.TIME_ZONE)
 
     def __str__(self):
         return u''.join((self.name)).encode('utf-8')
 
     class Meta:
         verbose_name_plural = "dishes"
+
+    @property
+    def is_available(self):
+        now = datetime.datetime.now().time()
+
+        if self.available_from < now and now < self.available_to:
+            return True
+        else:
+            return False
 
 class DishAddonCategory(models.Model):
     name = models.CharField(max_length=100)
