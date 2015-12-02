@@ -138,19 +138,19 @@ class Business(models.Model):
         now = datetime.datetime.now().time()
         weekday = datetime.datetime.today().weekday()
 
-        if weekday == 0 and self.monday_opens < now and now < self.monday_closes:
+        if weekday == 0 and self.monday_opens and self.monday_closes and self.monday_opens < now and now < self.monday_closes:
             return True
-        elif weekday == 1 and self.tuesday_opens < now and now < self.tuesday_closes:
+        elif weekday == 1 and self.tuesday_opens and self.tuesday_closes and self.tuesday_opens < now and now < self.tuesday_closes:
             return True
-        elif weekday == 2 and self.wednesday_opens < now and now < self.wednesday_closes:
+        elif weekday == 2 and self.wednesday_opens and self.wednesday_closes and self.wednesday_opens < now and now < self.wednesday_closes:
             return True
-        elif weekday == 3 and self.thursday_opens < now and now < self.thursday_closes:
+        elif weekday == 3 and self.thursday_opens and self.thursday_closes and self.thursday_opens < now and now < self.thursday_closes:
             return True
-        elif weekday == 4 and self.friday_opens < now and now < self.friday_closes:
+        elif weekday == 4 and self.friday_opens and self.friday_closes and self.friday_opens < now and now < self.friday_closes:
             return True
-        elif weekday == 5 and self.saturday_opens < now and now < self.saturday_closes:
+        elif weekday == 5 and self.saturday_opens and self.saturday_closes and self.saturday_opens < now and now < self.saturday_closes:
             return True
-        elif weekday == 6 and self.sunday_opens < now and now < self.sunday_closes:
+        elif weekday == 6 and self.sunday_opens and self.sunday_closes and self.sunday_opens < now and now < self.sunday_closes:
             return True
         else:
             return False
@@ -189,7 +189,7 @@ class Dish(models.Model):
     def is_available(self):
         now = datetime.datetime.now().time()
 
-        if self.available_from < now and now < self.available_to:
+        if self.available_from and self.available_to and self.available_from < now and now < self.available_to:
             return True
         else:
             return False
