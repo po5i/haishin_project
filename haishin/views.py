@@ -247,7 +247,7 @@ class BusinessViewSet(viewsets.ModelViewSet):
         elif city_id is not None:
             queryset = Business.objects.filter(town__city__id=city_id).order_by('closed')
         #sory by open
-        queryset = sorted(queryset, key=lambda t: not t.is_open)
+        #queryset = sorted(queryset, key=lambda t: not t.is_open)
         return queryset
 
 class JobViewSet(viewsets.ModelViewSet):
