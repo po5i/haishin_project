@@ -10,6 +10,7 @@ import json
 
 import calendar
 import shippify
+import pusher_backend
 
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
@@ -170,6 +171,7 @@ class JobSerializer(serializers.ModelSerializer):
         model = Job
 
     shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
+    pusher_backend.Pusher.init(settings.PUSHER_APP_ID, settings.PUSHER_KEY, settings.PUSHER_SECRET)
 
     # override in order to include 'details' field
     def to_internal_value(self, data):
@@ -198,11 +200,11 @@ class JobSerializer(serializers.ModelSerializer):
             ret['history'].append(serialized_history)
 
         # Shippify task info
-        #try:
-        response = shippify.Task.get_task(instance.shippify_task_id)
-        ret['shippify'] = response
-        #except:
-        #    ret['shippify'] = {}
+        try:
+            response = shippify.Task.get_task(instance.shippify_task_id)
+            ret['shippify'] = response
+        except:
+            ret['shippify'] = {}
 
         return ret
 
@@ -300,6 +302,9 @@ class JobSerializer(serializers.ModelSerializer):
             msg = "Shippify API ERROR: %s" % e
             job.delete()
             raise serializers.ValidationError(msg)
+
+        # integrate Pusher
+        pusher_backend.Pusher.message('delidelux','restaurant_' + str(job.business.id),'Hey!, Hay un nuevo pedido para tu negocio :)')
 
         return job
 

@@ -30,6 +30,11 @@
 
         pip install -r requirements.txt
 
+    Note: if mac gives you problems when installing pusher you should execute:
+
+        $ brew install pkg-config libffi
+        $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/
+
 6. Comment the **haishin** app line in `haishin_project/settings.py` **INSTALLED_APPS** list
 
         python manage.py migrate

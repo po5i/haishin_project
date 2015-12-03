@@ -252,7 +252,20 @@ class BusinessViewSet(viewsets.ModelViewSet):
 
 class JobViewSet(viewsets.ModelViewSet):
     serializer_class = JobSerializer
-    queryset = Job.objects.all()
+
+    def get_queryset(self):
+        business_id = self.request.query_params.get('business_id', None)
+        user_id = self.request.query_params.get('user_id', None)
+        status = self.request.query_params.get('status', None)
+        queryset = Job.objects.all()
+        if business_id is not None:
+            queryset = Job.objects.filter(business_id=business_id,business__admin=self.request.user).order_by('-timestamp')
+        if user_id is not None:
+            queryset = Job.objects.filter(user_id=user_id).order_by('-timestamp')
+        if status is not None:
+            queryset = Job.objects.filter(main_status=status).order_by('-timestamp')
+
+        return queryset
 
 class DishCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = DishCategorySerializer
