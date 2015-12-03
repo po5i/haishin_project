@@ -10,6 +10,7 @@ import json
 
 import calendar
 import shippify
+import pusher_backend
 
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
@@ -169,6 +170,9 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
 
+    shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
+    pusher_backend.Pusher.init(settings.PUSHER_APP_ID, settings.PUSHER_KEY, settings.PUSHER_SECRET)
+
     # override in order to include 'details' field
     def to_internal_value(self, data):
         output = super(JobSerializer, self).to_internal_value(data)
@@ -214,27 +218,32 @@ class JobSerializer(serializers.ModelSerializer):
         job = Job.objects.create(**validated_data)
 
         # save the details
-        shippify_products = []  #id, name, qty, size=2
-        total = 0
-        if details:
-            for detail in details:
-                dish = Dish.objects.get(id=detail["dish"])
-                total = total + dish.price
-                job_detail = JobDetail.objects.create(job=job,dish=dish)
-                shippify_products.append({
-                    'id': dish.id,
-                    'name': dish.name,
-                    'qty': detail["quantity"],
-                    'size': 2
-                })
+        try:
+            shippify_products = []  #id, name, qty, size=2
+            total = 0
+            if details:
+                for detail in details:
+                    dish = Dish.objects.get(id=detail["dish"])
+                    total = total + dish.price
+                    job_detail = JobDetail.objects.create(job=job,dish=dish)
+                    shippify_products.append({
+                        'id': dish.id,
+                        'name': dish.name,
+                        'qty': detail["quantity"],
+                        'size': 2
+                    })
 
-                # save the addons
-                if "addons" in detail:
-                    for addon in detail["addons"]:
-                        dish_addon = DishAddon.objects.get(id=addon.get("id"))
-                        total = total + dish_addon.price
-                        JobDetailAddons.objects.create(detail=job_detail,addon=dish_addon,price=dish_addon.price)
-
+                    # save the addons
+                    if "addons" in detail:
+                        for addon in detail["addons"]:
+                            dish_addon = DishAddon.objects.get(id=addon.get("id"))
+                            total = total + dish_addon.price
+                            JobDetailAddon.objects.create(job_detail=job_detail,addon=dish_addon,price=dish_addon.price)
+        except Exception as e:
+            job.delete()
+            raise serializers.ValidationError({
+                'addons': e
+            })
 
         # TODO: compute the total / check from client
         #job.total = total
@@ -284,7 +293,6 @@ class JobSerializer(serializers.ModelSerializer):
         }
 
         try:
-            shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
             response = shippify.Task.create_task(api_data)
             job.shippify_task_id = response['id']
             job.shippify_distance = response['distance']
@@ -292,11 +300,16 @@ class JobSerializer(serializers.ModelSerializer):
             job.save()
         except Exception as e:
             msg = "Shippify API ERROR: %s" % e
+            job.delete()
             raise serializers.ValidationError(msg)
+
+        # integrate Pusher
+        pusher_backend.Pusher.message('delidelux','restaurant_' + str(job.business.id),'Hey!, Hay un nuevo pedido para tu negocio :)')
 
         return job
 
     def update(self, instance, validated_data):
+        # update the job
         instance.main_status = validated_data.get('main_status', instance.main_status)
         instance.delivery_status = validated_data.get('delivery_status', instance.delivery_status)
         instance.save()
@@ -307,10 +320,20 @@ class JobSerializer(serializers.ModelSerializer):
 
         return job
 
+class SimpleDishSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dish
+
+class JobDetailAddonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobDetailAddon
+
 class JobDetailSerializer(serializers.ModelSerializer):
-    dish = DishSerializer()
+    dish = SimpleDishSerializer()
+    addons = JobDetailAddonSerializer(many=True)
     class Meta:
         model = JobDetail
+        depth = 0
 
 class JobStatusHistorySerializer(serializers.ModelSerializer):
     class Meta:

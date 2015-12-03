@@ -216,6 +216,9 @@ class DishAddon(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     category = models.ForeignKey(DishAddonCategory)
 
+    def __str__(self):
+        return u''.join(self.name).encode('utf-8')
+
 class Job(models.Model):
     MAIN_STATUSES = (
         ('Received', 'Received'),
@@ -273,8 +276,8 @@ class JobDetail(models.Model):
     job = models.ForeignKey(Job)
     dish = models.ForeignKey(Dish)
 
-class JobDetailAddons(models.Model):
-    detail = models.ForeignKey(JobDetail)
+class JobDetailAddon(models.Model):
+    job_detail = models.ForeignKey(JobDetail, related_name="addons")
     addon = models.ForeignKey(DishAddon)
     price = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)    #for history purposes
 
