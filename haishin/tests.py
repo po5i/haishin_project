@@ -97,7 +97,7 @@ class ApiTests(APISimpleTestCase):
                 'business': 2,
                 'recipient_name': 'Carlos',
                 'recipient_address': 'Angamos 317',
-                'main_status': 'Received',
+                'main_status': 'Draft',
                 'delivery_status': '1',
                 'remarks': 'Alergico a la soya',
                 'details': '[{"dish":"2","quantity":"1","addons":[{"id":"1"},{"id":"2"}] }]',

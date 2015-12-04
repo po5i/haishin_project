@@ -1,8 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 import sys,os,time
 import datetime
-from django.conf import settings
+import braintree
 
 #User._meta.get_field('email')._unique = True
 
@@ -81,6 +82,34 @@ class Profile(models.Model):
     def __str__(self):
         return u''.join((self.user.first_name," ",self.user.last_name)).encode('utf-8')
 
+    def create_or_update_braintree_customer(self,nonce):
+        try:
+            result = braintree.Customer.update(str(self.user.id), {
+                "payment_method_nonce": nonce
+            })
+            if result.is_success:
+                return result.customer, "ok"
+            else:
+                return False, result.message
+        except:
+            result = braintree.Customer.create({
+                "id": self.user.id,
+                "first_name": self.user.first_name,
+                "last_name": self.user.last_name,
+                "email": self.user.email,
+                "payment_method_nonce": nonce
+            })
+            if result.is_success:
+                return result.customer, "ok"
+            else:
+                return False, result.message
+
+    def get_braintree_customer(self):
+        try:
+            customer = braintree.Customer.find(str(self.user.id))
+            return customer, "ok"
+        except Exception as e:
+            return False, str(e)
 
 class BusinessCategory(models.Model):
     name = models.CharField(max_length=100)
@@ -221,6 +250,7 @@ class DishAddon(models.Model):
 
 class Job(models.Model):
     MAIN_STATUSES = (
+        ('Draft', 'Draft'),
         ('Received', 'Received'),
         ('Accepted', 'Accepted'),
         ('Rejected', 'Rejected'),
@@ -275,6 +305,7 @@ class Job(models.Model):
 class JobDetail(models.Model):
     job = models.ForeignKey(Job)
     dish = models.ForeignKey(Dish)
+    quantity = models.IntegerField(default=1)
 
 class JobDetailAddon(models.Model):
     job_detail = models.ForeignKey(JobDetail, related_name="addons")
@@ -290,3 +321,19 @@ class JobStatusHistory(models.Model):
     class Meta:
         ordering = ['timestamp']
 
+class PaymentMethod(models.Model):
+    user = models.ForeignKey(User)
+    job = models.ForeignKey(Job)
+    transaction_id = models.CharField(max_length=100)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    type = models.CharField(max_length=100)
+    card = models.CharField(max_length=10,blank=True,null=True)
+    last = models.CharField(max_length=5,blank=True,null=True)
+    paypal_email = models.CharField(max_length=100,blank=True,null=True)
+
+    def submit_for_settlement(self):
+        result = braintree.Transaction.submit_for_settlement(str(self.transaction_id))
+        if result.is_success:
+            return True, "ok"
+        else:
+            return False, result.message

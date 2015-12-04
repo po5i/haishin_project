@@ -108,7 +108,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static','uploads')
 MEDIA_URL = '/uploads/'
 
-#LOG 
+# LOG 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -133,7 +133,7 @@ LOGGING = {
     }
 }
 
-#MAIL
+# MAIL
 """
 SERVER_EMAIL = ''
 EMAIL_HOST = ''
@@ -161,7 +161,7 @@ TEMPLATE_CONTEXT_PROCESSORS = ("django.contrib.auth.context_processors.auth",
 )
 
 
-#REST
+# REST
 REST_FRAMEWORK = {
     # Use hyperlinked styles by default.
     # Only used if the `serializer_class` attribute is not set on a view.
@@ -181,19 +181,28 @@ REST_FRAMEWORK = {
     ),
 }
 
-#CORS 
+# CORS 
 CORS_ORIGIN_ALLOW_ALL = True
 
-#Google Maps Application
+# Google Maps Application
 GMAPS_API_CLIENT_KEY = "AIzaSyCC6zrIDWXAa2TtlyKaN7ohrRxC3vWp5Uo"
 
 #Shippify.co
-#SHIPPIFY_API_KEY = 'ihai7pnb0atnqba69psc3di'
-#SHIPPIFY_API_SECRET = '3371aed4f73724343cacfba60357a644'
-SHIPPIFY_API_KEY = 'igl0adxjv0rn6iea0vd3g14i'
-SHIPPIFY_API_SECRET = '174b807a225ee5becb125368a1cec119'
+#SHIPPIFY_API_KEY = 'ihai7pnb0atnqba69psc3di'               #prod
+#SHIPPIFY_API_SECRET = '3371aed4f73724343cacfba60357a644'   #prod
+SHIPPIFY_API_KEY = 'igl0adxjv0rn6iea0vd3g14i'               #test
+SHIPPIFY_API_SECRET = '174b807a225ee5becb125368a1cec119'    #test
 
-#Pusher
+# Pusher
 PUSHER_APP_ID = '156720'
 PUSHER_KEY = 'ac5e3597a8e60e9f12ef'
 PUSHER_SECRET = 'ff43af410cb81f418b79'
+
+# BRAINTREE
+import braintree
+MERCHANT_ID = "77w5vghgk6tm7k7g"
+braintree.Configuration.configure(braintree.Environment.Sandbox,
+                                  merchant_id=MERCHANT_ID,
+                                  public_key="g84m83v6fyqdjrn4",
+                                  private_key="8d9d3711cad0813389503c956af768cd")
+

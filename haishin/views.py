@@ -32,6 +32,8 @@ gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
 import json
 from rest_framework.renderers import JSONRenderer
 
+import braintree
+
 
 # Normal authentication classes
 class ObtainAuthToken(APIView):
@@ -133,6 +135,7 @@ class ObtainLogout(APIView):
                 return Response("Error, Tokes does not exists",status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response("Error, Not Authorized",status=status.HTTP_401_UNAUTHORIZED)
+
 
 
 class DistanceMatrix(APIView):
@@ -280,3 +283,67 @@ class CityViewSet(viewsets.ModelViewSet):
         code = self.request.query_params.get('code', None)
         queryset = City.objects.filter(country__code=code) if code is not None else City.objects.all()
         return queryset
+
+
+
+
+
+# Payments
+
+class BraintreeToken(APIView):
+    throttle_classes = ()
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        try:
+            token = braintree.ClientToken.generate()
+            return Response({'client_token': token})
+        except Exception as e:
+            return Response({'client_token': False, 'error': str(e)},status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class PaymentMethodViewSet(APIView):
+    throttle_classes = ()
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        user_id = self.request.DATA.get('user', None)
+        job_id = self.request.DATA.get('job', None)
+        nonce = self.request.DATA.get('nonce', None)
+        type = self.request.DATA.get('type', None)  # CreditCard, PayPalAccount
+        details = self.request.DATA.get('details', None) # cardType, lastTwo || email
+
+        if type == 'CreditCard':
+            card = details['cardType']
+            last = details['lastTwo']
+            email = ''
+        elif type == 'PayPalAccount':
+            card = ''
+            last = ''
+            email = details['email']
+
+        try:
+            user = User.objects.get(id=user_id)
+            job = Job.objects.get(id=job_id)
+            #user.profile.create_or_update_braintree_customer(nonce)
+
+            result = braintree.Transaction.sale({
+                "amount": str(job.total),
+                "payment_method_nonce": nonce,
+                "order_id": job_id,
+                # "shipping": {
+                #     "first_name": str(job.recipient_name),
+                #     "street_address": str(job.recipient_address),
+                #     "country_code_alpha2": str(job.business.town.city.country.code)
+                #   },
+            })
+            if result.is_success:
+                transaction_id = result.transaction.id
+                PaymentMethod.objects.create(user=user,job=job,type=type,card=card,last=last,paypal_email=email,transaction_id=transaction_id)
+                return Response({'result': 'Success'})
+            else:
+                return Response({'result': 'ResultError', 'error': str(result.message)},status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'result': 'ExceptionError', 'error': str(e)},status=status.HTTP_400_BAD_REQUEST)
+

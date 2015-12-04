@@ -42,6 +42,8 @@ urlpatterns = [
     url(r'^api-token/reset/', ResetPassword.as_view()),
     #url(r'^api-token/user/', ObtainUser.as_view()),
     url(r'^api-token/logout/', ObtainLogout.as_view()),
+    url(r'^payments/braintree-token/', BraintreeToken.as_view()),
+    url(r'^payments/payment-methods/', PaymentMethodViewSet.as_view()),
     url(r'^util/distance/', DistanceMatrix.as_view()),
     url(r'^util/restaurant/', RestaurantMatrix.as_view()),
     url(r'^util/dish/category/', DishByCategoryViewSet.as_view()),

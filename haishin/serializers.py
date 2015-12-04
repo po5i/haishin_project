@@ -208,59 +208,22 @@ class JobSerializer(serializers.ModelSerializer):
 
         return ret
 
-    def create(self, validated_data):
-        if "details" in validated_data:
-            details = validated_data.pop('details')
-        else:
-            details = None
-
-        # save the job
-        job = Job.objects.create(**validated_data)
-
-        # save the details
-        try:
-            shippify_products = []  #id, name, qty, size=2
-            total = 0
-            if details:
-                for detail in details:
-                    dish = Dish.objects.get(id=detail["dish"])
-                    total = total + dish.price
-                    job_detail = JobDetail.objects.create(job=job,dish=dish)
-                    shippify_products.append({
-                        'id': dish.id,
-                        'name': dish.name,
-                        'qty': detail["quantity"],
-                        'size': 2
-                    })
-
-                    # save the addons
-                    if "addons" in detail:
-                        for addon in detail["addons"]:
-                            dish_addon = DishAddon.objects.get(id=addon.get("id"))
-                            total = total + dish_addon.price
-                            JobDetailAddon.objects.create(job_detail=job_detail,addon=dish_addon,price=dish_addon.price)
-        except Exception as e:
-            job.delete()
-            raise serializers.ValidationError({
-                'addons': e
-            })
-
-        # TODO: compute the total / check from client
-        #job.total = total
-
-        # save the status history
-        JobStatusHistory.objects.create(job=job,main_status=job.main_status,delivery_status=job.delivery_status)
-
-        # Geolocalization job.recipient_address:
-        #response = gmaps.geocode(job.recipient_address)
-        #recipient_latitude = response[0]["geometry"]["location"]["lat"]
-        #recipient_longitude = response[0]["geometry"]["location"]["lng"]
+    def create_shippify(job):
+        # integrate shippify API
+        shippify_products = []  #id, name, qty, size=2
+        job_details = JobDetail.objects.filter(job=job)
+        for detail in job_details:
+            shippify_products.append({
+                    'id': detail.dish.id,
+                    'name': detail.dish.name,
+                    'qty': detail.dish.quantity,
+                    'size': 2
+                })
 
         # parse delivery_date to EPOCH
         # (delivery_date is in UTC)
         unix_delivery_date = calendar.timegm(job.delivery_date.timetuple())
 
-        # integrate shippify API
         api_data = {
             'task': {
                 'products': shippify_products,
@@ -299,19 +262,68 @@ class JobSerializer(serializers.ModelSerializer):
             job.shippify_price = response['price']
             job.save()
         except Exception as e:
-            msg = "Shippify API ERROR: %s" % e
+            msg = "Shippify API ERROR: %s" % str(e)
             job.delete()
             raise serializers.ValidationError(msg)
 
-        # integrate Pusher
-        pusher_backend.Pusher.message('delidelux','restaurant_' + str(job.business.id),'Hey!, Hay un nuevo pedido para tu negocio :)')
 
+    def create(self, validated_data):
+        if "details" in validated_data:
+            details = validated_data.pop('details')
+        else:
+            details = None
+
+        # save the job
+        job = Job.objects.create(**validated_data)
+
+        # save the details
+        try:
+            total = 0
+            if details:
+                for detail in details:
+                    dish = Dish.objects.get(id=detail["dish"])
+                    total = total + dish.price
+                    job_detail = JobDetail.objects.create(job=job,dish=dish,quantity=detail["quantity"])
+                    
+
+                    # save the addons
+                    if "addons" in detail:
+                        for addon in detail["addons"]:
+                            dish_addon = DishAddon.objects.get(id=addon.get("id"))
+                            total = total + dish_addon.price
+                            JobDetailAddon.objects.create(job_detail=job_detail,addon=dish_addon,price=dish_addon.price)
+        except Exception as e:
+            job.delete()
+            raise serializers.ValidationError({
+                'addons': str(e)
+            })
+
+        # save the status history
+        JobStatusHistory.objects.create(job=job,main_status=job.main_status,delivery_status=job.delivery_status)
+        
         return job
 
     def update(self, instance, validated_data):
+        new_main_status = validated_data.get('main_status', instance.main_status)
+        new_delivery_status = validated_data.get('delivery_status', instance.delivery_status)
+
+        if instance.main_status == 'Draft' and new_main_status == 'Received':
+            # send task to shippify
+            create_shippify(instance)
+            pusher_backend.Pusher.message('delidelux','restaurant_' + str(instance.business.id),'Hey!, Hay un nuevo pedido para tu negocio :)')
+        elif instance.main_status == 'Received' and new_main_status == 'Accepted':
+            # braintree submit for settlement
+            try:
+                PaymentMethod.objects.get(job=instance).submit_for_settlement()
+            except Exception as e:
+                raise serializers.ValidationError({
+                    'paymentMethod': str(e)
+                })
+
+
         # update the job
-        instance.main_status = validated_data.get('main_status', instance.main_status)
-        instance.delivery_status = validated_data.get('delivery_status', instance.delivery_status)
+        instance.main_status = new_main_status
+        instance.delivery_status = new_delivery_status
         instance.save()
 
         job = instance
