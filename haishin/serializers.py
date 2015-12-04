@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import datetime
 from haishin.models import *
 from rest_framework import status
@@ -10,6 +11,7 @@ import json
 
 import calendar
 import shippify
+import sendmails
 
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
@@ -22,7 +24,12 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(partial=True)
-
+    sendmails.Configuration.set_credentials(
+        settings.EMAIL_API_BASE_URL,
+        settings.EMAIL_API_KEY, 
+        settings.EMAIL_FROM,
+        settings.STATIC_ROOT
+    )
     def to_internal_value(self, data):
         if User.objects.filter(email=data.get("email")).count() > 1:
             raise serializers.ValidationError({
@@ -72,7 +79,17 @@ class UserSerializer(serializers.ModelSerializer):
         profile.address = profile_data.get('address', profile.address)
         profile.phone = profile_data.get('phone', profile.phone)
         profile.save()
-
+        mail_to=instance.email
+        mail_subject='Actualización de datos'
+        mail_to_name=instance.first_name + ' '+ instance.last_name
+        mail_messagge='La información de su usuario se ha actualizado.'
+        mail_sended = sendmails.Email.send(
+            mail_to,
+            mail_to_name,
+            mail_subject, 
+            mail_messagge
+        )
+       
         return instance
 
     class Meta:
@@ -105,6 +122,7 @@ class DishAddonCategorySerializer(serializers.ModelSerializer):
 
 class DishSerializer(serializers.ModelSerializer):
     is_available = serializers.ReadOnlyField()    #Model property
+    shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
     class Meta:
         model = Dish
     
@@ -170,7 +188,12 @@ class JobSerializer(serializers.ModelSerializer):
         model = Job
 
     shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
-
+    sendmails.Configuration.set_credentials(
+        settings.EMAIL_API_BASE_URL,
+        settings.EMAIL_API_KEY, 
+        settings.EMAIL_FROM,
+        settings.STATIC_ROOT
+    )
     # override in order to include 'details' field
     def to_internal_value(self, data):
         output = super(JobSerializer, self).to_internal_value(data)
@@ -296,6 +319,18 @@ class JobSerializer(serializers.ModelSerializer):
             job.shippify_distance = response['distance']
             job.shippify_price = response['price']
             job.save()
+            # send email
+            mail_to=api_data['task']['recipient']['email']
+            mail_subject='Orden registrada'
+            mail_to_name=api_data['task']['recipient']['name']
+            mail_messagge='Su orden fue registrada.'
+            mail_sended = sendmails.Email.send(
+                mail_to,
+                mail_to_name,
+                mail_subject, 
+                mail_messagge
+            )
+            
         except Exception as e:
             msg = "Shippify API ERROR: %s" % e
             job.delete()

@@ -192,3 +192,14 @@ SHIPPIFY_API_KEY = 'ihai7pnb0atnqba69psc3di'
 SHIPPIFY_API_SECRET = '3371aed4f73724343cacfba60357a644'
 #SHIPPIFY_API_KEY = 'i7p0cengnryk96fzip9442t9'
 #SHIPPIFY_API_SECRET = 'bf77573b25ef44da893fb30d890af78f'
+
+
+#Email
+EMAIL_API_KEY = 'key-1079b6a210ddead58af4a7b5d8bfc55b'
+EMAIL_API_BASE_URL = 'https://api.mailgun.net/v3/sandboxb6963014532c4459bfb9e0555b07ef94.mailgun.org'
+EMAIL_FROM = 'Mailgun Sandbox <postmaster@sandboxb6963014532c4459bfb9e0555b07ef94.mailgun.org>'
+EMAIL_API_USER = 'jorlusal'
+EMAIL_API_PASSWORD = 'delidelux01'
+
+
+
