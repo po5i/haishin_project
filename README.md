@@ -21,6 +21,9 @@
 3. Install Python dev
 
         sudo apt-get install python-dev
+        sudo apt-get install libffi-dev
+        sudo apt-get purge python-openssl
+        sudo pip install pyopenssl
 
 4. Install Libjpeg
 
