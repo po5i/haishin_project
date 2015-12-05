@@ -9,7 +9,7 @@ from haishin.models import *
 class ApiTests(APISimpleTestCase):
 
     def test_0_initialize_data(self):
-        User.objects.create(id=1000,username="admin",email="admin@haishin.com")
+        User.objects.create(id=1000,first_name="Kevin",last_name="Arriaga",username="admin",email="admin@haishin.com")
         Country.objects.create(id=1,name="Chile",code="CL")
         Country.objects.create(id=2,name="Argentina",code="AR")
         City.objects.create(id=1,country_id=1,name="Santiago",code="SCL")
@@ -113,10 +113,25 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['user'], user.id)
         self.assertEqual(response.data['business'], 2)
+        self.assertEqual(response.data['main_status'], 'Draft')
         self.assertEqual(response.data['recipient_name'], 'Carlos')
         self.assertEqual(response.data['details'][0]['id'], 1)
 
     def test_41_update_job_status(self):
+        data = {
+                'main_status': 'Received',
+                'delivery_status': '2',
+        }
+        user = User.objects.get(username='po5i')
+        token = Token.objects.get(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        job = Job.objects.get(user=user,business_id=2)
+        response = self.client.patch('/api/job/' + str(job.id) + '/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['main_status'], 'Received')
+        self.assertEqual(response.data['delivery_status'], '2')
+
+    def test_42_update_job_status(self):
         data = {
                 'main_status': 'Accepted',
                 'delivery_status': '2',
