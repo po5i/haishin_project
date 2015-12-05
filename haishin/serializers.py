@@ -12,7 +12,7 @@ import json
 import calendar
 import shippify
 import pusher_backend
-#import sendmails
+import sendmails
 
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
@@ -25,12 +25,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(partial=True)
-    # sendmails.Configuration.set_credentials(
-    #     settings.EMAIL_API_BASE_URL,
-    #     settings.EMAIL_API_KEY, 
-    #     settings.EMAIL_FROM,
-    #     settings.STATIC_ROOT
-    # )
+    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM)
+
     def to_internal_value(self, data):
         if User.objects.filter(email=data.get("email")).count() > 1:
             raise serializers.ValidationError({
@@ -80,16 +76,8 @@ class UserSerializer(serializers.ModelSerializer):
         profile.address = profile_data.get('address', profile.address)
         profile.phone = profile_data.get('phone', profile.phone)
         profile.save()
-        # mail_to=instance.email
-        # mail_subject='Actualización de datos'
-        # mail_to_name=instance.first_name + ' '+ instance.last_name
-        # mail_messagge='La información de su usuario se ha actualizado.'
-        # mail_sended = sendmails.Email.send(
-        #     mail_to,
-        #     mail_to_name,
-        #     mail_subject, 
-        #     mail_messagge
-        # )
+
+        mail_sended = sendmails.Email.notify_update_profile(instance,profile)
        
         return instance
 
@@ -191,12 +179,7 @@ class JobSerializer(serializers.ModelSerializer):
     shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
     pusher_backend.Pusher.init(settings.PUSHER_APP_ID, settings.PUSHER_KEY, settings.PUSHER_SECRET)
 
-    # sendmails.Configuration.set_credentials(
-    #     settings.EMAIL_API_BASE_URL,
-    #     settings.EMAIL_API_KEY, 
-    #     settings.EMAIL_FROM,
-    #     settings.STATIC_ROOT
-    # )
+    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM)
 
     # override in order to include 'details' field
     def to_internal_value(self, data):
@@ -233,7 +216,7 @@ class JobSerializer(serializers.ModelSerializer):
 
         return ret
 
-    def create_shippify(job):
+    def create_shippify(self,job):
         # integrate shippify API
         shippify_products = []  #id, name, qty, size=2
         job_details = JobDetail.objects.filter(job=job)
@@ -241,7 +224,7 @@ class JobSerializer(serializers.ModelSerializer):
             shippify_products.append({
                     'id': detail.dish.id,
                     'name': detail.dish.name,
-                    'qty': detail.dish.quantity,
+                    'qty': detail.quantity,
                     'size': 2
                 })
 
@@ -288,17 +271,7 @@ class JobSerializer(serializers.ModelSerializer):
             job.shippify_distance = response['distance']
             job.shippify_price = response['price']
             job.save()
-            # send email
-            mail_to=api_data['task']['recipient']['email']
-            mail_subject='Orden registrada'
-            mail_to_name=api_data['task']['recipient']['name']
-            mail_messagge='Su orden fue registrada.'
-            # mail_sended = sendmails.Email.send(
-            #     mail_to,
-            #     mail_to_name,
-            #     mail_subject, 
-            #     mail_messagge
-            # )
+            
             
         except Exception as e:
             msg = "Shippify API ERROR: %s" % str(e)
@@ -348,10 +321,12 @@ class JobSerializer(serializers.ModelSerializer):
 
         if instance.main_status == 'Draft' and new_main_status == 'Received':
             # send task to shippify
-            create_shippify(instance)
             pusher_backend.Pusher.message('delidelux','restaurant_' + str(instance.business.id),'Hey!, Hay un nuevo pedido para tu negocio :)')
+            mail_sended = sendmails.Email.notify_business_new_job(instance)
         elif instance.main_status == 'Received' and new_main_status == 'Accepted':
             # braintree submit for settlement
+            self.create_shippify(instance)
+            mail_sended = sendmails.Email.notify_client_job_accepted(instance)
             try:
                 PaymentMethod.objects.get(job=instance).submit_for_settlement()
             except Exception as e:
