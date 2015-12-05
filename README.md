@@ -20,45 +20,48 @@
 
 3. Install Python dev
 
-        sudo apt-get install python-dev
-        sudo apt-get install libffi-dev
-        sudo apt-get purge python-openssl
-        sudo pip install pyopenssl
+            sudo apt-get install python-dev
+            sudo apt-get install libffi-dev
+            sudo apt-get purge python-openssl
+            sudo pip install pyopenssl
 
 4. Install Libjpeg
 
-        sudo apt-get install libjpeg8-dev
+            sudo apt-get install libjpeg8-dev
 
-5.- Install  libxml2 and libxslt1
-    sudo apt-get install libxml2-dev
-    sudo apt-get install libxslt1-dev 
+5. Install  libxml2 and libxslt1
+
+            apt-get install libxml2-dev
+            apt-get install libxslt1-dev 
+            apt-get install python-libxml2
+            apt-get install python-libxslt1
 
 6. Install Django 1.8 and dependencies
 
-        pip install -r requirements.txt
+            pip install -r requirements.txt
 
     Note: if mac gives you problems when installing pusher you should execute:
 
-        $ brew install pkg-config libffi
-        $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/
+            $ brew install pkg-config libffi
+            $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/
 
 7. Comment the **haishin** app line in `haishin_project/settings.py` **INSTALLED_APPS** list
 
-        python manage.py migrate
+            python manage.py migrate
 
 8. Uncomment previous line
 
-        python manage.py makemigrations
-        python manage.py migrate
-        python manage.py createsuperuser
+            python manage.py makemigrations
+            python manage.py migrate
+            python manage.py createsuperuser
 
 9. Run the server
 
-        python manage.py runserver
+            python manage.py runserver
 
 10. Run the tests
 
-        python manage.py test
+            python manage.py test
 
 That's all!
 
