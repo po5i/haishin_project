@@ -326,13 +326,17 @@ class JobSerializer(serializers.ModelSerializer):
         elif instance.main_status == 'Received' and new_main_status == 'Accepted':
             # braintree submit for settlement
             self.create_shippify(instance)
-            mail_sended = sendmails.Email.notify_client_job_accepted(instance)
             try:
                 PaymentMethod.objects.get(job=instance).submit_for_settlement()
             except Exception as e:
                 raise serializers.ValidationError({
                     'paymentMethod': str(e)
                 })
+
+            mail_sended = sendmails.Email.notify_client_job_accepted(instance)
+            
+        # TODO: poner mas condiciones y combinaciones de estados
+
 
 
         # update the job
