@@ -4,6 +4,7 @@ from django.conf import settings
 import sys,os,time
 import datetime
 import braintree
+from ckeditor.fields import RichTextField
 
 #User._meta.get_field('email')._unique = True
 
@@ -30,10 +31,11 @@ class Country(models.Model):
     name = models.CharField(max_length=250)
     code = models.CharField(max_length=3,help_text='Ej: CL, AR, ...')
     tax = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)
+    shipping = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)
     average_delivery_time = models.IntegerField(blank=True,null=True,default=30,help_text='En minutos')
-    privacy = models.TextField(blank=True,null=True)
-    terms_conditions = models.TextField(blank=True,null=True)
-    about = models.TextField(blank=True,null=True)
+    privacy = RichTextField(blank=True,null=True)
+    terms_conditions = RichTextField(blank=True,null=True)
+    about = RichTextField(blank=True,null=True)
 
     def __str__(self):
         return u''.join(self.name).encode('utf-8')

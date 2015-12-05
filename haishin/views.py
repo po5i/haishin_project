@@ -285,6 +285,16 @@ class CityViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+class CountryViewSet(viewsets.ModelViewSet):
+    serializer_class = CountrySerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+
+    def get_queryset(self):
+        code = self.request.query_params.get('code', None)
+        print code
+        queryset = Country.objects.filter(code=code) if code is not None else Country.objects.all()
+        return queryset
+
 
 
 

@@ -29,6 +29,7 @@ router.register(r'user', UserViewSet)
 router.register(r'dish', DishViewSet, 'dish')
 router.register(r'dishcategory', DishCategoryViewSet, 'dishcategory')
 router.register(r'city', CityViewSet, 'city')
+router.register(r'country', CountryViewSet, 'country')
 router.register(r'business', BusinessViewSet, 'business')
 router.register(r'job', JobViewSet, 'job')
 

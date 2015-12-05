@@ -13,3 +13,4 @@ premailer==2.9.6
 cssselect==0.9.1
 cssutils==1.0.1
 lxml==3.5.0
+django-ckeditor==5.0.2
