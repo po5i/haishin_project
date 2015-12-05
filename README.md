@@ -29,7 +29,11 @@
 
         sudo apt-get install libjpeg8-dev
 
-5. Install Django 1.8 and dependencies
+5.- Install  libxml2 and libxslt1
+    sudo apt-get install libxml2-dev
+    sudo apt-get install libxslt1-dev 
+
+6. Install Django 1.8 and dependencies
 
         pip install -r requirements.txt
 
@@ -38,21 +42,21 @@
         $ brew install pkg-config libffi
         $ export PKG_CONFIG_PATH=/usr/local/Cellar/libffi/3.0.13/lib/pkgconfig/
 
-6. Comment the **haishin** app line in `haishin_project/settings.py` **INSTALLED_APPS** list
+7. Comment the **haishin** app line in `haishin_project/settings.py` **INSTALLED_APPS** list
 
         python manage.py migrate
 
-7. Uncomment previous line
+8. Uncomment previous line
 
         python manage.py makemigrations
         python manage.py migrate
         python manage.py createsuperuser
 
-8. Run the server
+9. Run the server
 
         python manage.py runserver
 
-9. Run the tests
+10. Run the tests
 
         python manage.py test
 

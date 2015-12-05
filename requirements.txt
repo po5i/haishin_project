@@ -8,3 +8,8 @@ django-filter==0.11.0
 googlemaps==2.4
 pusher==1.2.3
 braintree==3.20.0
+smtpapi==0.2.0
+premailer==2.9.6
+cssselect==0.9.1
+cssutils==1.0.1
+lxml==3.5.0

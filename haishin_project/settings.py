@@ -206,3 +206,10 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
                                   public_key="g84m83v6fyqdjrn4",
                                   private_key="8d9d3711cad0813389503c956af768cd")
 
+
+#Email
+EMAIL_API_KEY = 'key-1079b6a210ddead58af4a7b5d8bfc55b'
+EMAIL_API_BASE_URL = 'https://api.mailgun.net/v3/sandboxb6963014532c4459bfb9e0555b07ef94.mailgun.org'
+EMAIL_FROM = 'Mailgun Sandbox <postmaster@sandboxb6963014532c4459bfb9e0555b07ef94.mailgun.org>'
+EMAIL_API_USER = 'jorlusal'
+EMAIL_API_PASSWORD = 'delidelux01'
