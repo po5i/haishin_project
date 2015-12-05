@@ -298,7 +298,7 @@ class Job(models.Model):
     recipient_latitude = models.CharField(max_length=100,blank=True,null=True)
     recipient_longitude = models.CharField(max_length=100,blank=True,null=True)
     main_status = models.CharField(max_length=100,choices=MAIN_STATUSES)
-    delivery_date = models.DateTimeField()
+    delivery_date = models.DateTimeField(blank=True,null=True)
     delivery_status = models.CharField(max_length=100,choices=DELIVERY_STATUSES)
     payment_status = models.CharField(max_length=100,blank=True,null=True)
     remarks = models.TextField(blank=True,null=True)

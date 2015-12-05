@@ -247,6 +247,8 @@ class JobSerializer(serializers.ModelSerializer):
 
         # parse delivery_date to EPOCH
         # (delivery_date is in UTC)
+        if not job.delivery_date:
+            job.delivery_date = datetime.datetime.now()
         unix_delivery_date = calendar.timegm(job.delivery_date.timetuple())
 
         api_data = {
