@@ -17,6 +17,8 @@ import sendmails
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
 
+disablecss = False
+sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM, disablecss)
 
 class ProfileSerializer(serializers.ModelSerializer):
     get_chef_id = serializers.ReadOnlyField()    #Model property
@@ -25,8 +27,6 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(partial=True)
-    disablecss = True
-    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM, disablecss)
 
     def to_internal_value(self, data):
         if User.objects.filter(email=data.get("email")).count() > 1:
@@ -112,7 +112,6 @@ class DishAddonCategorySerializer(serializers.ModelSerializer):
 
 class DishSerializer(serializers.ModelSerializer):
     is_available = serializers.ReadOnlyField()    #Model property
-    shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
     class Meta:
         model = Dish
     
@@ -177,11 +176,8 @@ class JobSerializer(serializers.ModelSerializer):
     class Meta:
         model = Job
 
-    shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
+    shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET, settings.SHIPPIFY_DEBUG)
     pusher_backend.Pusher.init(settings.PUSHER_APP_ID, settings.PUSHER_KEY, settings.PUSHER_SECRET)
-
-    disablecss = True
-    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM, disablecss)
 
     # override in order to include 'details' field
     def to_internal_value(self, data):
@@ -273,12 +269,13 @@ class JobSerializer(serializers.ModelSerializer):
             job.shippify_distance = response['distance']
             job.shippify_price = response['price']
             job.save()
-            
-            
         except Exception as e:
             msg = "Shippify API ERROR: %s" % str(e)
-            job.delete()
-            raise serializers.ValidationError(msg)
+            if not settings.SHIPPIFY_DEBUG:
+                job.delete()
+                raise serializers.ValidationError(msg)
+            else:
+                print " !!! " + msg
 
 
     def create(self, validated_data):
@@ -330,7 +327,7 @@ class JobSerializer(serializers.ModelSerializer):
             try:
                 PaymentMethod.objects.get(job=instance).submit_for_settlement()
             except Exception as e:
-                pass #for the tests
+                print "PaymentMethod submit for settlement error: %s" % str(e)
                 #raise serializers.ValidationError({
                 #    'paymentMethod': str(e)
                 #})
@@ -339,6 +336,7 @@ class JobSerializer(serializers.ModelSerializer):
             pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Ya estamos cocinando tu pedido hecho en ' + str(instance.business.name))
 
         elif instance.main_status == 'Accepted' and new_main_status == 'Rejected':
+            mail_sended = sendmails.Email.notify_client_job_rejected(instance)
             pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Malas noticias, tu pedido hecho en ' + str(instance.business.name) + ' no puede ser aceptado.')
 
         elif new_delivery_status == '4':
@@ -346,16 +344,19 @@ class JobSerializer(serializers.ModelSerializer):
             pass
 
         elif instance.main_status == 'Accepted' and new_main_status == 'Shipped':
+            mail_sended = sendmails.Email.notify_client_job_shipped(instance)
             pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Tu pedido hecho en ' + str(instance.business.name) + ' va en camino.')
 
         elif new_delivery_status == '5':
             new_main_status = 'Shipped'
+            mail_sended = sendmails.Email.notify_client_job_shipped(instance)
             pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Tu pedido hecho en ' + str(instance.business.name) + ' va en camino.')
 
         elif new_delivery_status == '6':
             pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Tu pedido hecho en ' + str(instance.business.name) + ' esta por llegar.')
 
         elif new_delivery_status == '7':
+            mail_sended = sendmails.Email.notify_client_job_completed(instance)
             new_main_status = 'Completed'
 
         elif new_main_status == 'Cancelled':

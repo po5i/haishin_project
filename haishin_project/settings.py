@@ -196,6 +196,7 @@ GMAPS_API_CLIENT_KEY = "AIzaSyCC6zrIDWXAa2TtlyKaN7ohrRxC3vWp5Uo"
 #SHIPPIFY_API_SECRET = '3371aed4f73724343cacfba60357a644'   #prod
 SHIPPIFY_API_KEY = 'igl0adxjv0rn6iea0vd3g14i'               #test
 SHIPPIFY_API_SECRET = '174b807a225ee5becb125368a1cec119'    #test
+SHIPPIFY_DEBUG = True
 
 # Pusher
 PUSHER_APP_ID = '156720'
@@ -209,6 +210,10 @@ braintree.Configuration.configure(braintree.Environment.Sandbox,
                                   merchant_id=MERCHANT_ID,
                                   public_key="g84m83v6fyqdjrn4",
                                   private_key="8d9d3711cad0813389503c956af768cd")
+BRAINTREE_MERCHANTS = {
+    "CL": "delideluxcl",
+    "AR": "delideluxar"
+}
 
 
 #Email

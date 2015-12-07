@@ -45,9 +45,10 @@ import requests
 
 class Configuration(object):
 	@staticmethod
-	def set_credentials(api_key, api_secret):
+	def set_credentials(api_key, api_secret, debug=True):
 		Configuration.SHIPPIFY_API_KEY = api_key
 		Configuration.SHIPPIFY_API_SECRET = api_secret
+		Configuration.SHIPPIFY_DEBUG = debug
 
 	@staticmethod
 	def headers():
@@ -59,8 +60,12 @@ class Task(object):
 	@staticmethod
 	def create_task(api_data):
 		# POST https://services.shippify.co/task/new
+		if Configuration.SHIPPIFY_DEBUG:
+			endpoint = 'https://staging.shippify.co/task/new'
+		else:
+			endpoint = 'https://services.shippify.co/task/new'
 
-		response = requests.post('https://services.shippify.co/task/new', json=api_data, auth=(Configuration.SHIPPIFY_API_KEY, Configuration.SHIPPIFY_API_SECRET))
+		response = requests.post(endpoint, json=api_data, auth=(Configuration.SHIPPIFY_API_KEY, Configuration.SHIPPIFY_API_SECRET))
 		#print response.request.body
 		#print response.json()
 
@@ -74,8 +79,12 @@ class Task(object):
 	@staticmethod
 	def get_task(task_id):
 		# GET https://services.shippify.co/task/info/:taskId
+		if Configuration.SHIPPIFY_DEBUG:
+			endpoint = 'https://staging.shippify.co/task/info/%s' % task_id
+		else:
+			endpoint = 'https://services.shippify.co/task/info/%s' % task_id
 
-		response = requests.get('https://services.shippify.co/task/info/%s' % task_id, auth=(Configuration.SHIPPIFY_API_KEY, Configuration.SHIPPIFY_API_SECRET))
+		response = requests.get(endpoint, auth=(Configuration.SHIPPIFY_API_KEY, Configuration.SHIPPIFY_API_SECRET))
 
 		if response.status_code > 201:
 			raise Exception('Error %d: %s' % (response.status_code,response.text))

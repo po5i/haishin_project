@@ -341,6 +341,7 @@ class PaymentMethodViewSet(APIView):
             result = braintree.Transaction.sale({
                 "amount": str(job.total),
                 "payment_method_nonce": nonce,
+                "merchant_account_id": settings.BRAINTREE_MERCHANTS[job.business.town.city.country.code]
                 #"order_id": job_id,
                 # "shipping": {
                 #     "first_name": str(job.recipient_name),

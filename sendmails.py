@@ -160,7 +160,7 @@ class Email(object):
 
         name = job.user.first_name + " " + job.user.last_name
 
-        message = '<p>Tu pedido en '+job.business.name+' se esta cocinando.<br/>'
+        message = '<p>Tu pedido en '+job.business.name+' se está cocinando.<br/>'
 
         message += 'Saludos, el equipo de DeliDelux.</p>'
 
@@ -175,6 +175,68 @@ class Email(object):
               "subject": "Pedido aceptado.",
               "html": smart_str(Email.HTML)}
         )
-    
-        
 
+    @staticmethod
+    def notify_client_job_rejected(job):
+
+        name = job.user.first_name + " " + job.user.last_name
+
+        message = '<p>Lamentamos informarte que tu pedido en '+job.business.name+' ha sido rechazado por el siguiente motivo.<br/>'
+        message = '<br/>'+job.rejected_message+'<br/>'
+
+        message += 'Saludos, el equipo de DeliDelux.</p>'
+
+        Email.set_message_html(name,message)
+
+        requests.post(
+        Email.API_BASE_URL+"/messages",
+        auth=("api", Email.API_KEY),
+        data={"from": Email.FROM,
+              "to": job.user.email,
+              "cc": 'jorlusal@gmail.com',
+              "subject": "Pedido aceptado.",
+              "html": smart_str(Email.HTML)}
+        )
+
+    @staticmethod
+    def notify_client_job_shipped(job):
+
+        name = job.user.first_name + " " + job.user.last_name
+
+        message = '<p>En pocos minutos tu pedido de '+job.business.name+' llegará a su destino.<br/>'
+
+        message += 'Saludos, el equipo de DeliDelux.</p>'
+
+        Email.set_message_html(name,message)
+
+        requests.post(
+        Email.API_BASE_URL+"/messages",
+        auth=("api", Email.API_KEY),
+        data={"from": Email.FROM,
+              "to": job.user.email,
+              "cc": 'jorlusal@gmail.com',
+              "subject": "Pedido aceptado.",
+              "html": smart_str(Email.HTML)}
+        )
+
+    @staticmethod
+    def notify_client_job_completed(job):
+
+        name = job.user.first_name + " " + job.user.last_name
+
+        message = '<p>Tu pedido de '+job.business.name+' ha llegado a su destino..<br/>'
+        message = '<br/>Muchas gracias por confiar en nosotros.<br/>'
+
+        message += 'Saludos, el equipo de DeliDelux.</p>'
+
+        Email.set_message_html(name,message)
+
+        requests.post(
+        Email.API_BASE_URL+"/messages",
+        auth=("api", Email.API_KEY),
+        data={"from": Email.FROM,
+              "to": job.user.email,
+              "cc": 'jorlusal@gmail.com',
+              "subject": "Pedido aceptado.",
+              "html": smart_str(Email.HTML)}
+        )
