@@ -18,12 +18,14 @@
             cd DeliDelux/
             source bin/activate
 
-3. Install Python dev
+3. Install Python dev and Postgres
 
             sudo apt-get install python-dev
             sudo apt-get install libffi-dev
             sudo apt-get purge python-openssl
             sudo pip install pyopenssl
+            # if you don't want postgres installed in your system, you have to comment the psycopg2 in requirements.txt
+            sudo apt-get install postgresql-server-dev-9.3
 
 4. Install Libjpeg
 
@@ -31,10 +33,10 @@
 
 5. Install  libxml2 and libxslt1
 
-            apt-get install libxml2-dev
-            apt-get install libxslt1-dev 
-            apt-get install python-libxml2
-            apt-get install python-libxslt1
+            sudo apt-get install libxml2-dev
+            sudo apt-get install libxslt1-dev 
+            sudo apt-get install python-libxml2
+            sudo apt-get install python-libxslt1
 
     Note: if you are using mac, dont forget to: xcode-select --install
 

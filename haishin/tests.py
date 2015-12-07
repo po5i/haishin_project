@@ -145,6 +145,42 @@ class ApiTests(APISimpleTestCase):
         self.assertEqual(response.data['main_status'], 'Accepted')
         self.assertEqual(response.data['delivery_status'], '2')
 
+    def test_43_update_job_status(self):
+        data = {
+                'delivery_status': '5',
+        }
+        user = User.objects.get(username='po5i')
+        token = Token.objects.get(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        job = Job.objects.get(user=user,business_id=2)
+        response = self.client.patch('/api/job/' + str(job.id) + '/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['delivery_status'], '5')
+
+    def test_44_update_job_status(self):
+        data = {
+                'delivery_status': '6',
+        }
+        user = User.objects.get(username='po5i')
+        token = Token.objects.get(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        job = Job.objects.get(user=user,business_id=2)
+        response = self.client.patch('/api/job/' + str(job.id) + '/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['delivery_status'], '6')
+
+    def test_45_update_job_status(self):
+        data = {
+                'delivery_status': '7',
+        }
+        user = User.objects.get(username='po5i')
+        token = Token.objects.get(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        job = Job.objects.get(user=user,business_id=2)
+        response = self.client.patch('/api/job/' + str(job.id) + '/',data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['delivery_status'], '7')
+
     def test_5_filter_city(self):
         """
         Testing list of City by Country

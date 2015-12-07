@@ -298,7 +298,6 @@ class JobSerializer(serializers.ModelSerializer):
                     dish = Dish.objects.get(id=detail["dish"])
                     total = total + dish.price
                     job_detail = JobDetail.objects.create(job=job,dish=dish,quantity=detail["quantity"])
-                    
 
                     # save the addons
                     if "addons" in detail:
@@ -314,7 +313,7 @@ class JobSerializer(serializers.ModelSerializer):
 
         # save the status history
         JobStatusHistory.objects.create(job=job,main_status=job.main_status,delivery_status=job.delivery_status)
-        
+
         return job
 
     def update(self, instance, validated_data):
@@ -337,8 +336,37 @@ class JobSerializer(serializers.ModelSerializer):
                 #})
 
             mail_sended = sendmails.Email.notify_client_job_accepted(instance)
+            pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Ya estamos cocinando tu pedido hecho en ' + str(instance.business.name))
 
-        # TODO: poner mas condiciones y combinaciones de estados
+        elif instance.main_status == 'Accepted' and new_main_status == 'Rejected':
+            pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Malas noticias, tu pedido hecho en ' + str(instance.business.name) + ' no puede ser aceptado.')
+
+        elif new_delivery_status == '4':
+            # Habemus motorizado... avisar a alguien?
+            pass
+
+        elif instance.main_status == 'Accepted' and new_main_status == 'Shipped':
+            pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Tu pedido hecho en ' + str(instance.business.name) + ' va en camino.')
+
+        elif new_delivery_status == '5':
+            new_main_status = 'Shipped'
+            pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Tu pedido hecho en ' + str(instance.business.name) + ' va en camino.')
+
+        elif new_delivery_status == '6':
+            pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Tu pedido hecho en ' + str(instance.business.name) + ' esta por llegar.')
+
+        elif new_delivery_status == '7':
+            new_main_status = 'Completed'
+
+        elif new_main_status == 'Cancelled':
+            # desición del negocio de cancelar la orden?
+            pass
+
+        elif new_delivery_status == '0' and (instance.main_status != 'Cancelled' or new_main_status != 'Cancelled'):
+            # tenemos serios problemas aqui!
+            # Shippify esta cancelando la orden
+            pass
+
 
 
 
