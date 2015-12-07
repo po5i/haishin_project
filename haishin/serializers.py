@@ -25,7 +25,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer(partial=True)
-    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM)
+    disablecss = True
+    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM, disablecss)
 
     def to_internal_value(self, data):
         if User.objects.filter(email=data.get("email")).count() > 1:
@@ -179,7 +180,8 @@ class JobSerializer(serializers.ModelSerializer):
     shippify.Configuration.set_credentials(settings.SHIPPIFY_API_KEY, settings.SHIPPIFY_API_SECRET)
     pusher_backend.Pusher.init(settings.PUSHER_APP_ID, settings.PUSHER_KEY, settings.PUSHER_SECRET)
 
-    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM)
+    disablecss = True
+    sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM, disablecss)
 
     # override in order to include 'details' field
     def to_internal_value(self, data):

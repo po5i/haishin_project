@@ -303,6 +303,8 @@ class Job(models.Model):
     payment_status = models.CharField(max_length=100,blank=True,null=True)
     remarks = models.TextField(blank=True,null=True)
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    shipper_information = models.TextField(blank=True,null=True)
+    rejected_message = models.TextField(blank=True,null=True)
 
     class Meta:
         ordering = ['-timestamp']

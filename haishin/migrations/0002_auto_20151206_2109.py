@@ -7,18 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('haishin', '0018_auto_20151122_2056'),
+        ('haishin', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='job',
-            name='recipient_latitude',
-            field=models.CharField(max_length=100, null=True, blank=True),
+            name='rejected_message',
+            field=models.TextField(null=True, blank=True),
         ),
         migrations.AddField(
             model_name='job',
-            name='recipient_longitude',
-            field=models.CharField(max_length=100, null=True, blank=True),
+            name='shipper_information',
+            field=models.TextField(null=True, blank=True),
         ),
     ]

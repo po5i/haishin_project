@@ -2,74 +2,78 @@
 #import sendgrid
 import requests
 from django.utils.encoding import smart_str
-from premailer import transform
 
 class Email(object):
     @staticmethod
-    def set_configuration(api_base_url,api_key, e_from):
+    def set_configuration(api_base_url,api_key, e_from, disablecss=False):
         Email.API_BASE_URL = api_base_url
         Email.API_KEY = api_key
         Email.FROM = e_from
+        Email.DISABLECSS = disablecss
 
     @staticmethod
     def set_message_html(name, message):
-        Email.HTML = transform(('''
-<html>
-    <head>
-        <style type="text/css">
-            body{
-                background:#f2f2f2;
-                background:#d9d9d9;
-            }
-            #e-body{
-                width:400px;
-                margin: 0 auto;
-            }
-            #e-content{
-                border:solid 1px #d9d9d8;
-                border-color:#cccccc;
-                border-top:none;
-                padding:15px;
-                background: #FFFFFF;
-            }
-            #e-greetings{
-                padding-bottom:10px;
-                border-bottom:solid 1px #ff6600;
-            }
-            #e-message{
-                padding-top:10px;
-            }
-            #e-header{
-                padding-top:15px;
-                border-bottom:solid 10px #ff6600;
-            }
-            #e-foot{
-                font-size:10px;
-                color:#91918d;
-                padding-bottom:15px;
-            }
-        </style>
-    </head> 
-    <body>
-        <div id="e-body">
-            <div id="e-header">
-                <img src="http://delidelux.po5i.com/static/img/logo.png" alt="Delidelux"/>
-            </div>
-            <div id="e-content">
-                <div id="e-greetings">
-                    <label>Hola, '''+ smart_str(name) +'''</label>
+        if Email.DISABLECSS:
+            Email.HTML = smart_str(message)
+        else:
+            from premailer import transform
+            Email.HTML = transform(('''
+    <html>
+        <head>
+            <style type="text/css">
+                body{
+                    background:#f2f2f2;
+                    background:#d9d9d9;
+                }
+                #e-body{
+                    width:400px;
+                    margin: 0 auto;
+                }
+                #e-content{
+                    border:solid 1px #d9d9d8;
+                    border-color:#cccccc;
+                    border-top:none;
+                    padding:15px;
+                    background: #FFFFFF;
+                }
+                #e-greetings{
+                    padding-bottom:10px;
+                    border-bottom:solid 1px #ff6600;
+                }
+                #e-message{
+                    padding-top:10px;
+                }
+                #e-header{
+                    padding-top:15px;
+                    border-bottom:solid 10px #ff6600;
+                }
+                #e-foot{
+                    font-size:10px;
+                    color:#91918d;
+                    padding-bottom:15px;
+                }
+            </style>
+        </head> 
+        <body>
+            <div id="e-body">
+                <div id="e-header">
+                    <img src="http://delidelux.po5i.com/static/img/logo.png" alt="Delidelux"/>
                 </div>
-                <div id="e-message">'''+ smart_str(message) +smart_str('''</div>
+                <div id="e-content">
+                    <div id="e-greetings">
+                        <label>Hola, '''+ smart_str(name) +'''</label>
+                    </div>
+                    <div id="e-message">'''+ smart_str(message) +smart_str('''</div>
+                </div>
+                <div id="e-foot">
+                    <p>
+                        <b>Cláusula de confidencialidad:</b> La información contenida en el presente mensaje es confidencial y esta dirigida exclusivamente a su destinatario.<br/>
+                        <b>Nota:</b> Este mensaje ha sido generado automáticamente, favor no responda a este e-mail.
+                    </p> 
+                </div>
             </div>
-            <div id="e-foot">
-                <p>
-                    <b>Cláusula de confidencialidad:</b> La información contenida en el presente mensaje es confidencial y esta dirigida exclusivamente a su destinatario.<br/>
-                    <b>Nota:</b> Este mensaje ha sido generado automáticamente, favor no responda a este e-mail.
-                </p> 
-            </div>
-        </div>
-    </body>
-</html>''')).decode('utf8'))
+        </body>
+    </html>''')).decode('utf8'))
        
 
     @staticmethod

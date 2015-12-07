@@ -36,6 +36,8 @@
             apt-get install python-libxml2
             apt-get install python-libxslt1
 
+    Note: if you are using mac, dont forget to: xcode-select --install
+
 6. Install Django 1.8 and dependencies
 
             pip install -r requirements.txt
@@ -66,3 +68,11 @@
 That's all!
 
 To test, you can install Chrome extension [POSTMAN 3](https://chrome.google.com/webstore/detail/postman/fhbjgbiflinjbdggehcddcbncdddomop?hl=en) and import the `Haishin.json.postman_collection`.
+
+## Amazon Web Services deploy
+
+To upload to AWS, just make a zip of all the project and `upload and deploy` to a new python 2.7 64 bits Elastic Beanstalk instance with a new Postgresql RDS, you will find the admin user with pasword haishin. Go to /admin and change it.
+
+You can skip the static directory.
+
+The frontend should point to this EBS endpoint.
