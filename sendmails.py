@@ -99,7 +99,6 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": to,
-              "cc": 'jorlusal@gmail.com',
               "subject": subject,
               "html": Email.HTML})
 
@@ -126,7 +125,6 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": user.email,
-              "cc": 'jorlusal@gmail.com',
               "subject": "Actualización del perfil.",
               "html": smart_str(Email.HTML)}
         )
@@ -150,7 +148,6 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": job.user.email,
-              "cc": 'jorlusal@gmail.com',
               "subject": "Nuevo pedido.",
               "html": smart_str(Email.HTML)}
         )
@@ -160,7 +157,7 @@ class Email(object):
 
         name = job.user.first_name + " " + job.user.last_name
 
-        message = '<p>Tu pedido en '+job.business.name+' se está cocinando.<br/>'
+        message = smart_str('<p>Tu pedido en ')+smart_str(job.business.name)+smart_str(' se está cocinando.<br/>')
 
         message += 'Saludos, el equipo de DeliDelux.</p>'
 
@@ -171,7 +168,6 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": job.user.email,
-              "cc": 'jorlusal@gmail.com',
               "subject": "Pedido aceptado.",
               "html": smart_str(Email.HTML)}
         )
@@ -193,8 +189,7 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": job.user.email,
-              "cc": 'jorlusal@gmail.com',
-              "subject": "Pedido aceptado.",
+              "subject": "Pedido rechazado.",
               "html": smart_str(Email.HTML)}
         )
 
@@ -203,7 +198,7 @@ class Email(object):
 
         name = job.user.first_name + " " + job.user.last_name
 
-        message = '<p>En pocos minutos tu pedido de '+job.business.name+' llegará a su destino.<br/>'
+        message = smart_str('<p>En pocos minutos tu pedido de ')+smart_str(job.business.name)+smart_str(' llegará a su destino.<br/>')
 
         message += 'Saludos, el equipo de DeliDelux.</p>'
 
@@ -214,8 +209,7 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": job.user.email,
-              "cc": 'jorlusal@gmail.com',
-              "subject": "Pedido aceptado.",
+              "subject": "Pedido enviado.",
               "html": smart_str(Email.HTML)}
         )
 
@@ -236,7 +230,6 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": job.user.email,
-              "cc": 'jorlusal@gmail.com',
-              "subject": "Pedido aceptado.",
+              "subject": "Pedido completado.",
               "html": smart_str(Email.HTML)}
         )
