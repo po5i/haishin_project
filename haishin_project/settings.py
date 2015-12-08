@@ -42,6 +42,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'ckeditor',
     'haishin',
+    'storages',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -76,6 +77,25 @@ if 'RDS_HOSTNAME' in os.environ:    # A W S
             'PORT': os.environ['RDS_PORT'],
         }
     }
+
+    #AWS S3 storage
+    #https://www.caktusgroup.com/blog/2014/11/10/Using-Amazon-S3-to-store-your-Django-sites-static-and-media-files/
+    AWS_HEADERS = {  # see http://developer.yahoo.com/performance/rules.html#expires
+            'Expires': 'Thu, 31 Dec 2099 20:00:00 GMT',
+            'Cache-Control': 'max-age=94608000',
+    }
+
+    AWS_STORAGE_BUCKET_NAME = 'delidelux-uploads'
+    AWS_ACCESS_KEY_ID = 'AKIAITAAK2ZMRAEMLUOA'
+    AWS_SECRET_ACCESS_KEY = '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'
+
+    AWS_S3_CUSTOM_DOMAIN = 's3-us-west-2.amazonaws.com/%s' % AWS_STORAGE_BUCKET_NAME
+
+    MEDIA_URL = "https://%s/" % AWS_S3_CUSTOM_DOMAIN
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto.S3BotoStorage'
+    MEDIAFILES_LOCATION = 'uploads'
+    #MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN_UPLOADS , MEDIAFILES_LOCATION)
+    #DEFAULT_FILE_STORAGE = 'arcademe.storage.MediaStorage'
  
 else:
 
@@ -85,6 +105,9 @@ else:
             'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
         }
     }
+
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'static','uploads')
+    MEDIA_URL = '/uploads/'
 
 
 
@@ -109,8 +132,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 #STATIC_ROOT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static','uploads')
-MEDIA_URL = '/uploads/'
 
 # LOG 
 LOGGING = {

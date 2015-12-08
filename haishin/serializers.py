@@ -17,7 +17,7 @@ import sendmails
 import googlemaps
 gmaps = googlemaps.Client(key=settings.GMAPS_API_CLIENT_KEY)
 
-disablecss = False
+disablecss = True
 sendmails.Email.set_configuration(settings.EMAIL_API_BASE_URL,settings.EMAIL_API_KEY, settings.EMAIL_FROM, disablecss)
 
 class ProfileSerializer(serializers.ModelSerializer):
