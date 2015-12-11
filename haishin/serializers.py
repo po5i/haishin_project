@@ -95,10 +95,10 @@ class BusinessSerializer(serializers.ModelSerializer):
     is_open = serializers.ReadOnlyField()    #Model property
     admin = UserSerializer()
     category = BusinessCategorySerializer()
-    lookup_field = 'slug'
-    extra_kwargs = {
-        'url': {'lookup_field': 'slug'}
-    }
+    # lookup_field = 'slug'
+    # extra_kwargs = {
+    #     'url': {'lookup_field': 'slug'}
+    # }
     class Meta:
         model = Business
 
@@ -416,10 +416,10 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class CitySerializer(serializers.ModelSerializer):
     country = CountrySerializer()
-    lookup_field = 'slug'
-    extra_kwargs = {
-        'url': {'lookup_field': 'slug'}
-    }
+    # lookup_field = 'slug'
+    # extra_kwargs = {
+    #     'url': {'lookup_field': 'slug'}
+    # }
     class Meta:
         model = City
 
