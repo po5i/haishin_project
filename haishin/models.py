@@ -5,6 +5,7 @@ import sys,os,time
 import datetime
 import braintree
 from ckeditor.fields import RichTextField
+from django.template.defaultfilters import slugify
 
 #User._meta.get_field('email')._unique = True
 
@@ -36,6 +37,7 @@ class Country(models.Model):
     privacy = RichTextField(blank=True,null=True)
     terms_conditions = RichTextField(blank=True,null=True)
     about = RichTextField(blank=True,null=True)
+    url = models.CharField(max_length=100,blank=True,null=True)
 
     def __str__(self):
         return u''.join(self.name).encode('utf-8')
@@ -46,6 +48,7 @@ class Country(models.Model):
 
 class City(models.Model):
     name = models.CharField(max_length=250)
+    slug = models.SlugField(max_length=100,help_text='Se va a generar automaticamente')
     code = models.CharField(max_length=5,help_text='Ej: SCL, CABA, ...')
     country = models.ForeignKey(Country)
     image = models.ImageField(upload_to=get_city_path,blank=True,null=True)
@@ -56,6 +59,10 @@ class City(models.Model):
     class Meta:
         verbose_name_plural = "cities"
         ordering = ['name']
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(City, self).save(*args, **kwargs)
 
 class Town(models.Model):
     name = models.CharField(max_length=250)
@@ -82,7 +89,6 @@ class Profile(models.Model):
     address = models.CharField(max_length=100)
     phone = models.CharField(max_length=100,blank=True,null=True)
     source = models.CharField(max_length=200,blank=True,null=True,choices=SOURCES)
-    #TODO: guardar informacion que braintree necesite
 
     def __str__(self):
         return u''.join((self.user.first_name," ",self.user.last_name)).encode('utf-8')
@@ -129,6 +135,7 @@ class BusinessCategory(models.Model):
 
 class Business(models.Model):
     admin = models.ForeignKey(User)
+    slug = models.SlugField(max_length=100,help_text='Se va a generar automaticamente')
     category = models.ForeignKey(BusinessCategory)
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True,null=True)
@@ -163,6 +170,10 @@ class Business(models.Model):
 
     def __str__(self):
         return u''.join(("",self.name)).encode('utf-8')
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super(Business, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "businesses"

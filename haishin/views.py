@@ -240,6 +240,7 @@ class DishViewSet(viewsets.ModelViewSet):
 class BusinessViewSet(viewsets.ModelViewSet):
     serializer_class = BusinessSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    lookup_field = 'slug'
 
     def get_queryset(self):
         city_id = self.request.query_params.get('city_id', None)
@@ -278,6 +279,7 @@ class DishCategoryViewSet(viewsets.ModelViewSet):
 class CityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    lookup_field = 'slug'
 
     def get_queryset(self):
         code = self.request.query_params.get('code', None)
