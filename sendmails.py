@@ -233,3 +233,27 @@ class Email(object):
               "subject": "Pedido completado.",
               "html": smart_str(Email.HTML)}
         )
+
+    @staticmethod
+    def notify_payment_change(job, previous_status, current_status):
+
+        #name = job.user.first_name + " " + job.user.last_name
+        name = job.business.admin.first_name + " " + job.business.admin.last_name
+
+        message = '<p>Hay un cambio en el estado del pago del pedido ' + str(job.id) + '.<br/><br/>'
+        message += '<b>Cliente: </b>'+job.user.first_name + " " + job.user.last_name+'<br/>'
+        message += '<b>Estado anterior: </b>' + str(previous_status) + '.<br/>'
+        message += '<b>Estado actual: </b>' + str(current_status) + '.<br/><br/>'
+        message += 'Saludos, el equipo de DeliDelux.</p>'
+
+        Email.set_message_html(name,message)
+
+        requests.post(
+        Email.API_BASE_URL+"/messages",
+        auth=("api", Email.API_KEY),
+        data={"from": Email.FROM,
+              "to": job.user.email,
+              "bcc": "carlos.po5i@gmail.com",
+              "subject": "Cambio de estado en el pago.",
+              "html": smart_str(Email.HTML)}
+        )

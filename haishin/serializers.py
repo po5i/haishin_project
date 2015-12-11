@@ -391,6 +391,7 @@ class SimpleDishSerializer(serializers.ModelSerializer):
         model = Dish
 
 class JobDetailAddonSerializer(serializers.ModelSerializer):
+    addon = DishAddonSerializer()
     class Meta:
         model = JobDetailAddon
 

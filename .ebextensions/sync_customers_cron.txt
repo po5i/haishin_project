@@ -1,0 +1,4 @@
+#http://stackoverflow.com/questions/14077095/aws-elastic-beanstalk-running-a-cronjob
+# The newline at the end of this file is extremely important.  Cron won't run without it.
+
+*/5  * * * * root source /opt/python/current/env && django-admin.py braintree_check > /dev/null

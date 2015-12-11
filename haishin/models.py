@@ -348,10 +348,20 @@ class PaymentMethod(models.Model):
     card = models.CharField(max_length=10,blank=True,null=True)
     last = models.CharField(max_length=5,blank=True,null=True)
     paypal_email = models.CharField(max_length=100,blank=True,null=True)
+    last_status = models.CharField(max_length=100,blank=True,null=True)
+    last_update = models.DateTimeField(blank=True,null=True)
 
     def submit_for_settlement(self):
         result = braintree.Transaction.submit_for_settlement(str(self.transaction_id))
         if result.is_success:
+            self.update_status()
             return True, "ok"
         else:
             return False, result.message
+
+    def update_status(self):
+        result = braintree.Transaction.find(str(self.transaction_id))
+        self.last_status = result.status
+        self.last_update = result.updated_at
+        self.save()
+        return True, "ok"
