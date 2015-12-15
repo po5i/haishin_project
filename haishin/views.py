@@ -197,9 +197,10 @@ class DishByCategoryViewSet(APIView):
 
     def get(self, request):
         business_id = self.request.query_params.get('business_id', None)
+        published = self.request.query_params.get('published', True)
 
         categories = {}
-        dishes = Dish.objects.filter(business_id=business_id,published=True).order_by('name') if business_id is not None else None
+        dishes = Dish.objects.filter(business_id=business_id,published=published).order_by('name') if business_id is not None else None
         for dish in dishes:
             if not categories.has_key(dish.category.name):
                 categories[dish.category.name] = []
@@ -234,7 +235,8 @@ class DishViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         business_id = self.request.query_params.get('business_id', None)
-        queryset = Dish.objects.filter(business_id=business_id,published=True) if business_id is not None else None
+        published = self.request.query_params.get('published', True)
+        queryset = Dish.objects.filter(business_id=business_id,published=published) if business_id is not None else None
         return queryset
 
 class BusinessViewSet(viewsets.ModelViewSet):

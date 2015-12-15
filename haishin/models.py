@@ -38,6 +38,7 @@ class Country(models.Model):
     terms_conditions = RichTextField(blank=True,null=True)
     about = RichTextField(blank=True,null=True)
     url = models.CharField(max_length=100,blank=True,null=True)
+    minimum_order = models.DecimalField(blank=True,null=True,max_digits=10, decimal_places=2)
 
     def __str__(self):
         return u''.join(self.name).encode('utf-8')
