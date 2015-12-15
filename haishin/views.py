@@ -236,7 +236,10 @@ class DishViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         business_id = self.request.query_params.get('business_id', None)
         published = self.request.query_params.get('published', True)
-        queryset = Dish.objects.filter(business_id=business_id,published=published) if business_id is not None else None
+        if business_id is not None:
+            queryset = Dish.objects.filter(business_id=business_id,published=published)
+        else:
+            queryset = Dish.objects.filter(published=published)
         return queryset
 
 class BusinessViewSet(viewsets.ModelViewSet):
