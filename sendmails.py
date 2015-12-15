@@ -16,8 +16,10 @@ class Email(object):
         if Email.DISABLECSS:
             Email.HTML = smart_str(message)
         else:
-            from premailer import transform
-            Email.HTML = transform(('''
+            import pynliner
+            #from premailer import transform
+            #Email.HTML = transform(('''
+            Email.HTML = pynliner.fromString(('''
     <html>
         <head>
             <style type="text/css">
@@ -74,6 +76,7 @@ class Email(object):
             </div>
         </body>
     </html>''')).decode('utf8'))
+
        
 
     @staticmethod

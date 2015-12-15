@@ -14,3 +14,4 @@ django-ckeditor==5.0.2
 #premailer==2.9.6
 django-storages==1.1.8
 boto==2.34.0
+pynliner==0.5.2
