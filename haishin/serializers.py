@@ -291,6 +291,11 @@ class JobSerializer(serializers.ModelSerializer):
         # save the job
         job = Job.objects.create(**validated_data)
 
+        #update user address
+        user = job.user
+        user.profile.address = job.recipient_address
+        user.profile.save()
+
         # save the details
         try:
             total = 0
