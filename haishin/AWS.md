@@ -101,3 +101,35 @@ Created a new RDS for this instance (type postgres)
 	User: delideluxadmin
 	Password: 5Sc9dALc7mbqRdVD
 
+
+
+# SSL
+# http://knightlab.northwestern.edu/2015/05/21/implementing-ssl-on-amazon-s3-static-websites/
+
+pip install awscli
+aws configure
+
+Access Key ID:
+AKIAIZ7WILWTC67722SA
+Secret Access Key:
+VzD1vF5osrlrGqzksxSRD3Px+g1MeukkGx4iWul+
+
+openssl req -nodes -newkey rsa:2048 -keyout delidelux_cl.key -out delidelux_cl.csr
+
+Activate the certificate on Namecheap
+
+aws iam upload-server-certificate \
+--server-certificate-name delidelux.cl \
+--certificate-body file://delidelux_cl.crt \
+--private-key file://delidelux_cl.key \
+--certificate-chain file://delidelux_cl.ca-bundle \
+--path /cloudfront/
+
+aws iam upload-server-certificate \
+--server-certificate-name delidelux.com.ar \
+--certificate-body file://delidelux_com_ar.crt \
+--private-key file://delidelux_com_ar.key \
+--certificate-chain file://delidelux_com_ar.ca-bundle \
+--path /cloudfront/
+
+Create Cloudfront distribution
