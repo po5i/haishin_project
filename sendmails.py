@@ -156,14 +156,14 @@ class Email(object):
         )
 
     @staticmethod
-    def notify_business_credit_problem(job, message):
+    def notify_business_credit_problem(job, error):
         
         name = job.business.admin.first_name + " " + job.business.admin.last_name
         message = '<p>Hay un problema con la transaccion.</p>'
 
         message += '<p> <b>Cliente: </b>'+job.user.first_name + " " + job.user.last_name+'<br/>'
         message += '<p> <b>Pedido: </b>'+str(job.id)+'<br/>'
-        message += '<p> <b>Mensaje: </b>'+message+'<br/>'
+        message += '<p> <b>Mensaje: </b>'+error+'<br/>'
 
         message += 'Saludos, el equipo de DeliDelux.</p>'
 
@@ -174,7 +174,7 @@ class Email(object):
         auth=("api", Email.API_KEY),
         data={"from": Email.FROM,
               "to": job.user.email,
-              "subject": "Nuevo pedido.",
+              "subject": "Problema con el pago del pedido aceptado.",
               "html": smart_str(Email.HTML)}
         )
 
