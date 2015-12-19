@@ -334,15 +334,17 @@ class JobSerializer(serializers.ModelSerializer):
             # braintree submit for settlement
             self.create_shippify(instance)
             try:
-                PaymentMethod.objects.get(job=instance).submit_for_settlement()
+                payment_method = PaymentMethod.objects.get(job=instance)
+                status, message = payment_method.submit_for_settlement()
+                if status:
+                    mail_sended = sendmails.Email.notify_client_job_accepted(instance)
+                    pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Ya estamos cocinando tu pedido hecho en ' + str(instance.business.name))
+                else:
+                    raise Exception(message)
             except Exception as e:
                 print "PaymentMethod submit for settlement error: %s" % str(e)
-                #raise serializers.ValidationError({
-                #    'paymentMethod': str(e)
-                #})
-
-            mail_sended = sendmails.Email.notify_client_job_accepted(instance)
-            pusher_backend.Pusher.message('delidelux','user_' + str(instance.user.id),'Ya estamos cocinando tu pedido hecho en ' + str(instance.business.name))
+                mail_sended = sendmails.Email.notify_business_credit_problem(instance, str(e))
+                
 
         elif instance.main_status == 'Accepted' and new_main_status == 'Rejected':
             mail_sended = sendmails.Email.notify_client_job_rejected(instance)

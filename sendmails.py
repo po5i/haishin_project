@@ -156,6 +156,29 @@ class Email(object):
         )
 
     @staticmethod
+    def notify_business_credit_problem(job, message):
+        
+        name = job.business.admin.first_name + " " + job.business.admin.last_name
+        message = '<p>Hay un problema con la transaccion.</p>'
+
+        message += '<p> <b>Cliente: </b>'+job.user.first_name + " " + job.user.last_name+'<br/>'
+        message += '<p> <b>Pedido: </b>'+str(job.id)+'<br/>'
+        message += '<p> <b>Mensaje: </b>'+message+'<br/>'
+
+        message += 'Saludos, el equipo de DeliDelux.</p>'
+
+        Email.set_message_html(name,message)
+
+        requests.post(
+        Email.API_BASE_URL+"/messages",
+        auth=("api", Email.API_KEY),
+        data={"from": Email.FROM,
+              "to": job.user.email,
+              "subject": "Nuevo pedido.",
+              "html": smart_str(Email.HTML)}
+        )
+
+    @staticmethod
     def notify_client_job_accepted(job):
 
         name = job.user.first_name + " " + job.user.last_name

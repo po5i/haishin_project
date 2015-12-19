@@ -7,6 +7,9 @@ import braintree
 from ckeditor.fields import RichTextField
 from django.template.defaultfilters import slugify
 
+import stripe
+stripe.api_key = settings.STRIPE_KEY
+
 #User._meta.get_field('email')._unique = True
 
 def get_avatar_path(self,filename):
@@ -341,6 +344,11 @@ class JobStatusHistory(models.Model):
         ordering = ['timestamp']
 
 class PaymentMethod(models.Model):
+    SOURCES = (
+        ('braintree', 'braintree'),
+        ('stripe', 'stripe'),
+        ('manual', 'manual'),
+    )
     user = models.ForeignKey(User)
     job = models.ForeignKey(Job)
     transaction_id = models.CharField(max_length=100)
@@ -348,21 +356,47 @@ class PaymentMethod(models.Model):
     type = models.CharField(max_length=100)
     card = models.CharField(max_length=10,blank=True,null=True)
     last = models.CharField(max_length=5,blank=True,null=True)
+    currency = models.CharField(max_length=5,blank=True,null=True)
     paypal_email = models.CharField(max_length=100,blank=True,null=True)
     last_status = models.CharField(max_length=100,blank=True,null=True)
     last_update = models.DateTimeField(blank=True,null=True)
+    source = models.CharField(max_length=200,blank=True,null=True,choices=SOURCES)
 
     def submit_for_settlement(self):
-        result = braintree.Transaction.submit_for_settlement(str(self.transaction_id))
-        if result.is_success:
-            self.update_status()
-            return True, "ok"
-        else:
-            return False, result.message
+        if self.source == 'braintree':
+            result = braintree.Transaction.submit_for_settlement(str(self.transaction_id))
+            if result.is_success:
+                self.update_status()
+                return True, "ok"
+            else:
+                return False, result.message
+        elif self.source == 'stripe':
+            try:
+                total = int(self.job.total)
+                charge = stripe.Charge.create(
+                    amount=total,
+                    currency=self.currency,
+                    source=self.transaction_id,
+                    description="Cargo por venta",
+                    metadata={
+                        "job_id": str(self.job.id),
+                        "business_id": str(self.job.business.id),
+                        "user_id": str(self.user.id)
+                    }
+                )
+                return True, "ok"
+            except stripe.error.CardError, e:
+                # The card has been declined
+                return False, str(e)
+            except Exception as e:
+                return False, str(e)
 
     def update_status(self):
-        result = braintree.Transaction.find(str(self.transaction_id))
-        self.last_status = result.status
-        self.last_update = result.updated_at
-        self.save()
-        return True, "ok"
+        if self.source == 'braintree':
+            result = braintree.Transaction.find(str(self.transaction_id))
+            self.last_status = result.status
+            self.last_update = result.updated_at
+            self.save()
+            return True, "ok"
+        else:
+            return True, "ok"

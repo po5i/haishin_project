@@ -97,6 +97,7 @@ if 'RDS_HOSTNAME' in os.environ:    # A W S
     #MEDIA_URL = "https://%s/%s/" % (AWS_S3_CUSTOM_DOMAIN_UPLOADS , MEDIAFILES_LOCATION)
     #DEFAULT_FILE_STORAGE = 'arcademe.storage.MediaStorage'
  
+    STRIPE_KEY = "sk_live_ZIigps1f2BFCCFgnXwN52MtM"
 else:
 
     DATABASES = {
@@ -108,6 +109,8 @@ else:
 
     MEDIA_ROOT = os.path.join(BASE_DIR, 'static','uploads')
     MEDIA_URL = '/uploads/'
+
+    STRIPE_KEY = "sk_test_wCp2BPssuA9Si5gint7uhKaj"
 
 
 

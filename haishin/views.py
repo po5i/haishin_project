@@ -330,6 +330,7 @@ class PaymentMethodViewSet(APIView):
         nonce = self.request.DATA.get('nonce', None)
         type = self.request.DATA.get('type', None)  # CreditCard, PayPalAccount
         details = self.request.DATA.get('details', None) # cardType, lastTwo || email
+        currency = self.request.DATA.get('currency') # cardType, lastTwo || email
 
         if type == 'CreditCard':
             card = details['cardType']
@@ -343,25 +344,25 @@ class PaymentMethodViewSet(APIView):
         try:
             user = User.objects.get(id=user_id)
             job = Job.objects.get(id=job_id)
-            #user.profile.create_or_update_braintree_customer(nonce)
 
-            result = braintree.Transaction.sale({
-                "amount": str(job.total),
-                "payment_method_nonce": nonce,
-                "merchant_account_id": settings.BRAINTREE_MERCHANTS[job.business.town.city.country.code]
-                #"order_id": job_id,
-                # "shipping": {
-                #     "first_name": str(job.recipient_name),
-                #     "street_address": str(job.recipient_address),
-                #     "country_code_alpha2": str(job.business.town.city.country.code)
-                #   },
-            })
-            if result.is_success:
-                transaction_id = result.transaction.id
-                PaymentMethod.objects.create(user=user,job=job,type=type,card=card,last=last,paypal_email=email,transaction_id=transaction_id)
-                return Response({'result': 'Success'})
-            else:
-                return Response({'result': 'ResultError', 'error': str(result.message)},status=status.HTTP_400_BAD_REQUEST)
+            # Stripe
+            # We only need to save the token (nonce) for charge later
+            PaymentMethod.objects.create(user=user,job=job,type=type,card=card,last=last,transaction_id=nonce,source='stripe',currency=currency)
+            return Response({'result': 'Success'})
+
+            # Braintree
+            #user.profile.create_or_update_braintree_customer(nonce)    # not
+            # result = braintree.Transaction.sale({
+            #     "amount": str(job.total),
+            #     "payment_method_nonce": nonce,
+            #     "merchant_account_id": settings.BRAINTREE_MERCHANTS[job.business.town.city.country.code]
+            # })
+            # if result.is_success:
+            #     transaction_id = result.transaction.id
+            #     PaymentMethod.objects.create(user=user,job=job,type=type,card=card,last=last,paypal_email=email,transaction_id=transaction_id,source='braintree')
+            #     return Response({'result': 'Success'})
+            # else:
+            #     return Response({'result': 'ResultError', 'error': str(result.message)},status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'result': 'ExceptionError', 'error': str(e)},status=status.HTTP_400_BAD_REQUEST)
 
